@@ -12,6 +12,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "element-ui": "^2.7.0",
     "vue": "^2.6.6",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^8.0.0",
