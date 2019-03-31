@@ -1,10 +1,9 @@
+import "reflect-metadata";
+
 export interface Node {
     view: UIView
     subviews: Node[]
 }
-
-// let a = Reflect.metadata("1", 2)
-// let b = a()
 
 export class UIColor {
     r!: number
@@ -28,43 +27,78 @@ export class UIFont {
     }
 }
 
-
-function sealed(a: any, b: any) {
-    // do something with 'target' ...
-    console.log(a)
-    console.log(b)
+export interface UIViewAttribute {
+    key: string
+    value: any
+    type: any
 }
 
-export class UIView {
+interface IRawParams {
+    [key: string]: any
+}
+
+function attribute(type: any) {
+    return (target: Object, propertyKey: string | symbol): void => {
+        Reflect.defineMetadata('isAttribute', true, target, propertyKey)
+        Reflect.defineMetadata('design:type', type, target, propertyKey)
+    }
+}
+
+export class UIView implements IRawParams {
+    [key: string]: any
+
     name: string = "view"
     className: string = "UIView"
 
-    backgroundColor?: UIColor
+    // @Reflect.metadata('isAttribute', true)
+    @attribute(UIColor)
+    backgroundColor: UIColor | null = null
 
+    get attributes(): UIViewAttribute[] {
+        console.log(Object.keys(this))
+
+        return Object.keys(this).filter(k => Reflect.getMetadata('isAttribute', this, k)).map(k => {
+            return {
+                key: k,
+                value: this[k],
+                type: Reflect.getMetadata("design:type", this, k)
+            }
+        })
+    }
 }
 
 export class UILabel extends UIView {
-    text?: string
-    textColor?: UIColor
+    name: string = "label"
+    className: string = "UILabel"
+
+    @attribute(String)
+    text: string | null = null
+
+    @attribute(UIColor)
+    textColor: UIColor | null = null
+
+    @attribute(UIFont)
     font: UIFont = UIFont.system(17)
 
     constructor() {
         super()
-
-        this.name = "label"
-        this.className = "UILabel"
     }
 }
 
 export class UIButton extends UIView {
-    title?: string
-    titleColor?: UIColor
+    name: string = "button"
+    className: string = "UIButton"
+
+    @attribute(String)
+    title: string | null = null
+
+    @attribute(UIColor)
+    titleColor: UIColor | null = null
+
+    @attribute(UIFont)
     font: UIFont = UIFont.system(17)
 
     constructor() {
         super()
-
-        this.name = "button"
-        this.className = "UIButton"
     }
 }

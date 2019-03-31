@@ -10,7 +10,11 @@ Vue.config.productionTip = false
 Vue.use(ElementUI);
 
 new Vue({
-  router,
+  // router,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  // mounted() {
+  //   // Prevent blank screen in Electron builds
+  //   this.$router.push('/')
+  // }
 }).$mount('#app')

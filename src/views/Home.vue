@@ -53,7 +53,6 @@ export default class Home extends Vue {
   };
 
   handleNodeClick(data: Node) {
-    console.log(data);
     this.selectedNode = data;
   }
 
@@ -65,13 +64,6 @@ export default class Home extends Vue {
         click() {}
       })
     );
-    // menu.append(new MenuItem({ type: "separator" }));
-    // menu.append(
-    //   new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true })
-    // );
-    // console.log(event);
-    // console.log(data);
-    // console.log(node);
     menu.popup({ window: remote.getCurrentWindow() });
   }
 }

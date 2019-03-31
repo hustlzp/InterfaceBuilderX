@@ -1,8 +1,21 @@
 <template>
   <div id="app">
-    <router-view/>
+    <home/>
+    <!-- <router-view/> -->
   </div>
 </template>
+
+<script lang="ts">
+import Vue from "vue";
+import Home from "@/views/Home.vue";
+
+export default Vue.extend({
+  components: {
+    Home: Home
+  }
+});
+</script>
+
 
 <style lang="scss">
 #app {

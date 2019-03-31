@@ -44,6 +44,17 @@ export default class PropertiesPanel extends Vue {
   onNodeChanged(val: Node | null, oldVal: Node | null) {
     this.form.name = val ? val.view.name : null;
     this.form.className = val ? val.view.className : null;
+
+    let attributes = val ? val.view.attributes : [];
+    attributes.forEach(attribute => {
+      let type = attribute.type;
+
+      if (typeof type == "function") {
+        console.log(type.name);
+      } else {
+        console.log(type);
+      }
+    });
   }
 }
 </script>
