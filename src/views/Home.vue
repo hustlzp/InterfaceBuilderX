@@ -14,14 +14,14 @@
       </span>
     </el-tree>
 
-    <properties-panel :node="selectedNode"></properties-panel>
+    <properties-panel :node="selectedNode" @update="didUpdateProperty"></properties-panel>
   </div>
 </template>
 
 <script lang="ts">
 const { remote } = require("electron");
 const { Menu, MenuItem } = remote;
-import { Node, UILabel, UIView } from "@/cocoa";
+import { Node, UILabel, UIView, UIViewAttribute } from "@/cocoa";
 import { Component, Vue } from "vue-property-decorator";
 import PropertiesPanel from "@/components/PropertiesPanel.vue"; // @ is an alias to /src
 
@@ -56,6 +56,14 @@ export default class Home extends Vue {
     this.selectedNode = data;
   }
 
+  didUpdateProperty(object: { attribute: UIViewAttribute; value: any }) {
+    let { attribute, value } = object;
+
+    if (this.selectedNode) {
+      this.selectedNode.view[attribute.key] = value;
+    }
+  }
+
   showContextMenu(event: any, data: any, node: any) {
     const menu = new Menu();
     menu.append(
@@ -81,7 +89,7 @@ export default class Home extends Vue {
 }
 
 .properties-panel {
-  width: 300px;
+  width: 360px;
   position: fixed;
   top: 0;
   right: 0;

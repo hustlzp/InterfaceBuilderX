@@ -2,9 +2,9 @@
   <div class="properties-panel">
     <el-collapse v-model="activeNames">
       <el-collapse-item title="基本" name="basic">
-        <el-form ref="form" label-width="50px" size="small">
+        <el-form ref="form" label-width="80px" size="small">
           <el-form-item label="类">
-            <el-input v-model="form.className"></el-input>
+            <span class="static-text-value class-name">{{form.className}}</span>
           </el-form-item>
           <el-form-item label="名称">
             <el-input v-model="form.name"></el-input>
@@ -12,13 +12,13 @@
         </el-form>
       </el-collapse-item>
       <el-collapse-item title="属性" name="attributes">
-        <el-form ref="form" label-width="50px" size="small">
-          <!-- <el-form-item label="类">
-            <el-input v-model="form.className"></el-input>
-          </el-form-item>
-          <el-form-item label="名称">
-            <el-input v-model="form.name"></el-input>
-          </el-form-item>-->
+        <el-form ref="form" label-width="80px" size="small">
+          <property-form-item
+            v-for="attribute in attributes"
+            :key="attribute.key"
+            :attribute="attribute"
+            @update="didAttributeUpdate($event, attribute)"
+          ></property-form-item>
         </el-form>
       </el-collapse-item>
     </el-collapse>
@@ -27,9 +27,14 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Node } from "@/cocoa";
+import { Node, UIViewAttribute, UIView } from "@/cocoa";
+import PropertyFormItem from "@/components/PropertyFormItem.vue";
 
-@Component
+@Component({
+  components: {
+    PropertyFormItem
+  }
+})
 export default class PropertiesPanel extends Vue {
   @Prop(Node) node?: Node;
 
@@ -39,6 +44,10 @@ export default class PropertiesPanel extends Vue {
     name: this.node ? this.node.view.name : null,
     className: this.node ? this.node.view.className : null
   };
+
+  didAttributeUpdate(val: any, attribute: UIViewAttribute) {
+    this.$emit("update", { attribute, value: val });
+  }
 
   @Watch("node")
   onNodeChanged(val: Node | null, oldVal: Node | null) {
@@ -56,6 +65,14 @@ export default class PropertiesPanel extends Vue {
       }
     });
   }
+
+  get attributes(): UIViewAttribute[] {
+    return this.node ? this.node.view.attributes : [];
+  }
+
+  get view(): UIView | null {
+    return this.node ? this.node.view : null;
+  }
 }
 </script>
 
@@ -63,6 +80,10 @@ export default class PropertiesPanel extends Vue {
 .properties-panel {
   //   padding: 10px 10px;
   //   border-top: none;
+}
+
+.class-name {
+  font-weight: bold;
 }
 
 .el-collapse {
