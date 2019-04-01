@@ -22,7 +22,9 @@ export default class PropertyFormItem extends Vue {
     } else if (this.isNumber) {
       return this.attribute.value;
     } else if (this.isColor) {
-      return (this.attribute.value as UIColor).hex;
+      return this.attribute.value
+        ? (this.attribute.value as UIColor).hex
+        : null;
     } else {
       return null;
     }
@@ -30,7 +32,6 @@ export default class PropertyFormItem extends Vue {
 
   @Watch("value")
   onValueChanged(val: any, oldVal: any) {
-    console.log(val);
     if (this.isText) {
       this.$emit("update", val);
     } else if (this.isNumber) {
@@ -40,6 +41,11 @@ export default class PropertyFormItem extends Vue {
     } else {
       this.$emit("update", val);
     }
+  }
+
+  @Watch("attribute")
+  onAttributeChanged(val: any, oldVal: any) {
+    this.value = this.getFromAttribute();
   }
 
   get isText(): boolean {

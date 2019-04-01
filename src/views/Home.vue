@@ -56,11 +56,11 @@ export default class Home extends Vue {
     this.selectedNode = data;
   }
 
-  didUpdateProperty(object: { attribute: UIViewAttribute; value: any }) {
-    let { attribute, value } = object;
+  didUpdateProperty(object: { key: string; value: any }) {
+    let { key, value } = object;
 
     if (this.selectedNode) {
-      this.selectedNode.view[attribute.key] = value;
+      this.selectedNode.view[key] = value;
     }
   }
 

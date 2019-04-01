@@ -46,7 +46,7 @@ export default class PropertiesPanel extends Vue {
   };
 
   didAttributeUpdate(val: any, attribute: UIViewAttribute) {
-    this.$emit("update", { attribute, value: val });
+    this.$emit("update", { key: attribute.key, value: val });
   }
 
   @Watch("node")
@@ -54,16 +54,21 @@ export default class PropertiesPanel extends Vue {
     this.form.name = val ? val.view.name : null;
     this.form.className = val ? val.view.className : null;
 
-    let attributes = val ? val.view.attributes : [];
-    attributes.forEach(attribute => {
-      let type = attribute.type;
+    // let attributes = val ? val.view.attributes : [];
+    // attributes.forEach(attribute => {
+    //   let type = attribute.type;
 
-      if (typeof type == "function") {
-        console.log(type.name);
-      } else {
-        console.log(type);
-      }
-    });
+    //   if (typeof type == "function") {
+    //     console.log(type.name);
+    //   } else {
+    //     console.log(type);
+    //   }
+    // });
+  }
+
+  @Watch("form.name")
+  onNameUpdate(val: string) {
+    this.$emit("update", { key: "name", value: val });
   }
 
   get attributes(): UIViewAttribute[] {
