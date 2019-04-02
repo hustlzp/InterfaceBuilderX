@@ -2,7 +2,7 @@
   <div class="home">
     <el-tree
       class="view-tree"
-      :data="nodes"
+      :data="[node]"
       :props="defaultProps"
       @node-click="handleNodeClick"
       default-expand-all
@@ -14,6 +14,8 @@
       </span>
     </el-tree>
 
+    <views-panel :node="node"></views-panel>
+
     <properties-panel :node="selectedNode" @update="didUpdateProperty"></properties-panel>
   </div>
 </template>
@@ -23,33 +25,33 @@ const { remote } = require("electron");
 const { Menu, MenuItem } = remote;
 import { Node, UILabel, UIView, UIViewAttribute } from "@/cocoa";
 import { Component, Vue } from "vue-property-decorator";
-import PropertiesPanel from "@/components/PropertiesPanel.vue"; // @ is an alias to /src
+import PropertiesPanel from "@/components/PropertiesPanel.vue";
+import ViewsPanel from "@/components/ViewsPanel.vue";
 
 @Component({
   components: {
-    PropertiesPanel
+    PropertiesPanel,
+    ViewsPanel
   }
 })
 export default class Home extends Vue {
   selectedNode: Node | null = null;
 
-  nodes?: Node[] = [
-    {
-      view: new UIView(),
-      subviews: [
-        {
-          view: new UILabel(),
-          subviews: [] as Node[]
-        }
-      ]
-    }
-  ] as Node[];
+  node: Node = {
+    view: new UIView(),
+    subnodes: [
+      {
+        view: new UILabel(),
+        subnodes: [] as Node[]
+      }
+    ]
+  };
 
   defaultProps = {
     label: (data: Node, node: any): string => {
       return data.view.name;
     },
-    children: "subviews"
+    children: "subnodes"
   };
 
   handleNodeClick(data: Node) {
@@ -86,6 +88,14 @@ export default class Home extends Vue {
   bottom: 0;
   border-right: 1px solid #dcdcdc;
   padding: 10px 0;
+}
+
+.views-panel {
+  position: fixed;
+  top: 0;
+  right: 360px;
+  bottom: 0;
+  left: 300px;
 }
 
 .properties-panel {

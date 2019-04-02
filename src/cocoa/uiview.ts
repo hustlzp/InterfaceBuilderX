@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import uuidv4 from 'uuid/v4';
 
 interface IRawParams {
     [key: string]: any
@@ -6,7 +7,7 @@ interface IRawParams {
 
 export interface Node {
     view: UIView
-    subviews: Node[]
+    subnodes: Node[]
 }
 
 export class UIColor {
@@ -72,6 +73,7 @@ function attribute(type: any, label: string) {
 export class UIView implements IRawParams {
     [key: string]: any
 
+    id: string = uuidv4()
     name: string = "view"
     className: string = "UIView"
 

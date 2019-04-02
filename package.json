@@ -14,6 +14,7 @@
   "dependencies": {
     "element-ui": "^2.7.0",
     "reflect-metadata": "^0.1.13",
+    "uuid": "^3.3.2",
     "vue": "^2.6.6",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^8.0.0",
@@ -21,6 +22,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@types/uuid": "^3.4.4",
     "@vue/cli-plugin-babel": "^3.5.0",
     "@vue/cli-plugin-typescript": "^3.5.0",
     "@vue/cli-service": "^3.5.0",
