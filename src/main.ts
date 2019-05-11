@@ -22,10 +22,7 @@ Vue.directive('highlightjs', {
     targets.forEach((target) => {
       // if a value is directly assigned to the directive, use this
       // instead of the element content.
-      if (binding.value) {
-        target.innerHTML = binding.value
-      }
-      // console.log(hljs)
+      target.innerHTML = binding.value || null
       hljs.highlightBlock(target)
     })
   },
@@ -33,10 +30,8 @@ Vue.directive('highlightjs', {
     // after an update, re-fill the content and then highlight
     let targets = el.querySelectorAll('code')
     targets.forEach((target) => {
-      if (binding.value) {
-        target.innerHTML = binding.value
-        hljs.highlightBlock(target)
-      }
+      target.innerHTML = binding.value || null
+      hljs.highlightBlock(target)
     })
   }
 })

@@ -1,27 +1,32 @@
 <template>
   <div class="home">
-    <el-tree
-      class="view-tree"
-      :data="[node]"
-      node-key="id"
-      draggable
-      ref="tree"
-      highlight-current
-      :props="defaultProps"
-      @node-click="handleNodeClick"
-      default-expand-all
-      :expand-on-click-node="false"
-      @node-contextmenu="showContextMenu"
-    >
-      <span class="custom-tree-node" slot-scope="{ node }">
-        <span>{{ node.label }}</span>
-      </span>
-    </el-tree>
+    <div class="tree-panel" @contextmenu="showContextMenu">
+      <el-tree
+        class="view-tree"
+        :data="nodes"
+        node-key="id"
+        draggable
+        ref="tree"
+        highlight-current
+        :props="defaultProps"
+        @node-click="handleNodeClick"
+        default-expand-all
+        :expand-on-click-node="false"
+        :empty-text="null"
+        @node-contextmenu="showContextMenu"
+      >
+        <span class="custom-tree-node" slot-scope="{ node }">
+          <span>{{ node.label }}</span>
+        </span>
+      </el-tree>
+    </div>
 
     <!-- <views-panel :node="node"></views-panel> -->
-    <codes-panel :node="node"></codes-panel>
+    <codes-panel :node="nodes.length > 0 ? nodes[0] : null"></codes-panel>
 
     <properties-panel :node="selectedNode" @update="didUpdateProperty"></properties-panel>
+
+    <add-view-dialog :visible.sync="addViewDialogVisible" @create="didCreateNode"></add-view-dialog>
   </div>
 </template>
 
@@ -44,48 +49,30 @@ import { Component, Vue, Watch } from "vue-property-decorator";
 import PropertiesPanel from "@/components/PropertiesPanel.vue";
 import ViewsPanel from "@/components/ViewsPanel.vue";
 import CodesPanel from "@/components/CodesPanel.vue";
+import AddViewDialog from "@/components/AddViewDialog.vue";
+import { ElTree } from "element-ui/types/tree";
 
 @Component({
   components: {
     PropertiesPanel,
     ViewsPanel,
-    CodesPanel
+    CodesPanel,
+    AddViewDialog
   }
 })
 export default class Home extends Vue {
   selectedNode: Node | null = null;
 
-  node: Node = {
-    id: uuidv4(),
-    view: new UIView(),
-    subnodes: [
-      {
-        id: uuidv4(),
-        view: new UILabel(),
-        subnodes: []
-      },
-      {
-        id: uuidv4(),
-        view: new UIButton(),
-        subnodes: []
-      },
-      {
-        id: uuidv4(),
-        view: new UIImageView(),
-        subnodes: []
-      },
-      {
-        id: uuidv4(),
-        view: new UITableView(),
-        subnodes: []
-      },
-      {
-        id: uuidv4(),
-        view: new UITextField(),
-        subnodes: []
-      }
-    ]
-  };
+  // nodes: Node[] = [
+  //   new Node(new UIView(), [
+  //     new Node(new UILabel()),
+  //     new Node(new UIButton()),
+  //     new Node(new UIImageView()),
+  //     new Node(new UITableView()),
+  //     new Node(new UITextField())
+  //   ])
+  // ];
+  nodes: Node[] = [];
 
   defaultProps = {
     label: (data: Node, node: any): string => {
@@ -94,12 +81,10 @@ export default class Home extends Vue {
     children: "subnodes"
   };
 
+  addViewDialogVisible: boolean = false;
+
   handleNodeClick(data: Node) {
     this.selectedNode = data;
-    // 解决需要点击两次才能 highlight 的 BUG
-    this.$nextTick(() => {
-      (this.$refs.tree as any).setCurrentKey(data.id);
-    });
   }
 
   didUpdateProperty(object: { key: string; value: any }) {
@@ -110,28 +95,106 @@ export default class Home extends Vue {
     }
   }
 
-  showContextMenu(event: any, data: any, node: any) {
+  didCreateNode(node: Node) {
+    if (this.selectedNode) {
+      this.selectedNode.subnodes.push(node);
+    } else if (this.nodes.length > 0) {
+      this.nodes[0].subnodes.push(node);
+    } else {
+      this.nodes.push(node);
+    }
+
+    this.selectedNode = node;
+  }
+
+  removeSelectedNode() {
+    if (!this.selectedNode) {
+      return;
+    }
+
+    this.$confirm("确认删除？")
+      .then(_ => {
+        if (this.selectedNode == this.nodes[0]) {
+          this.nodes = [];
+          this.selectedNode = null;
+          return;
+        }
+
+        (this.$refs.tree as ElTree).remove(this.selectedNode);
+      })
+      .catch(_ => {});
+  }
+
+  showContextMenu(event: any, data: Node) {
     const menu = new Menu();
+    let that = this;
+
+    if (data) {
+      this.selectedNode = data;
+    }
+
     menu.append(
       new MenuItem({
         label: "Add Subview",
-        click() {}
+        click() {
+          that.addViewDialogVisible = true;
+        }
       })
     );
+
+    if (data) {
+      menu.append(
+        new MenuItem({
+          label: "Remove",
+          click() {
+            that.removeSelectedNode();
+          }
+        })
+      );
+    }
+
     menu.popup({ window: remote.getCurrentWindow() });
+  }
+
+  @Watch("selectedNode")
+  selectedNodeChanged() {
+    this.setCurrentNode();
+  }
+
+  @Watch("addViewDialogVisible")
+  addViewDialogVisibleChanged() {
+    this.setCurrentNode();
+  }
+
+  setCurrentNode() {
+    this.$nextTick(() => {
+      if (!this.selectedNode) {
+        return;
+      }
+
+      (this.$refs.tree as ElTree).setCurrentKey(this.selectedNode.id);
+    });
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.view-tree {
+.tree-panel {
   width: 260px;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   border-right: 1px solid #dcdcdc;
-  padding: 10px 0;
+
+  .view-tree {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    padding: 10px 0;
+  }
 }
 
 .views-panel {

@@ -5,42 +5,46 @@ interface IRawParams {
     [key: string]: any
 }
 
-export interface Node {
-    id: string
-    view: UIView
-    subnodes: Node[]
-}
+export class Node {
+    id: string = uuidv4()
+    view!: UIView
+    subnodes: Node[] = []
 
-export function codesForNode(node: Node): string {
-    let codes = viewCodesForNode(null, node)
-
-    codes += "\n\n// 约束\n\n"
-    codes += layoutCodesForNode(null, node)
-
-    return codes
-}
-
-function viewCodesForNode(supernode: Node | null, node: Node): string {
-    let codes = node.view.codes(supernode ? supernode.view : null)
-
-    // console.log(codes)
-    for (const subnode of node.subnodes) {
-        codes += "\n\n"
-        codes += viewCodesForNode(node, subnode)
+    constructor(view: UIView, subnodes: Node[] = []) {
+        this.view = view
+        this.subnodes = subnodes
     }
 
-    return codes
-}
+    codes(): string {
+        let codes = this.viewCodes(null)
 
-function layoutCodesForNode(supernode: Node | null, node: Node): string {
-    let codes = node.view.layoutCodes(supernode ? supernode.view : null)
+        codes += "\n\n// 约束\n\n"
+        codes += this.layoutCodes(null)
 
-    for (const subnode of node.subnodes) {
-        codes += "\n\n"
-        codes += layoutCodesForNode(node, subnode)
+        return codes
     }
 
-    return codes
+    viewCodes(supernode: Node | null): string {
+        let codes = this.view.codes(supernode ? supernode.view : null)
+
+        for (const subnode of this.subnodes) {
+            codes += "\n\n"
+            codes += subnode.viewCodes(this)
+        }
+
+        return codes
+    }
+
+    layoutCodes(supernode: Node | null): string {
+        let codes = this.view.layoutCodes(supernode ? supernode.view : null)
+
+        for (const subnode of this.subnodes) {
+            codes += "\n\n"
+            codes += subnode.layoutCodes(this)
+        }
+
+        return codes
+    }
 }
 
 export class UIColor {

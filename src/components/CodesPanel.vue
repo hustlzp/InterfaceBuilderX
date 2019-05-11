@@ -15,9 +15,6 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { Node as NodeClass } from "@/cocoa";
 import NodeRender from "@/components/NodeRender.vue";
-import { codesForNode } from "@/cocoa";
-
-// const { remote } =
 const { clipboard } = require("electron");
 
 @Component({
@@ -26,11 +23,7 @@ const { clipboard } = require("electron");
   }
 })
 export default class ViewsPanel extends Vue {
-  @Prop() node!: NodeClass;
-
-  codesForNode(): string {
-    return codesForNode(this.node);
-  }
+  @Prop(NodeClass) node!: NodeClass | null;
 
   copyCodes() {
     clipboard.writeText(this.codes);
@@ -38,7 +31,7 @@ export default class ViewsPanel extends Vue {
   }
 
   get codes(): string {
-    return codesForNode(this.node);
+    return this.node ? this.node.codes() : "";
   }
 }
 </script>
