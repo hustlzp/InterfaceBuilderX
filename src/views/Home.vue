@@ -14,7 +14,8 @@
       </span>
     </el-tree>
 
-    <views-panel :node="node"></views-panel>
+    <!-- <views-panel :node="node"></views-panel> -->
+    <codes-panel :node="node"></codes-panel>
 
     <properties-panel :node="selectedNode" @update="didUpdateProperty"></properties-panel>
   </div>
@@ -23,15 +24,27 @@
 <script lang="ts">
 const { remote } = require("electron");
 const { Menu, MenuItem } = remote;
-import { Node, UILabel, UIView, UIViewAttribute } from "@/cocoa";
+
+import {
+  Node,
+  UILabel,
+  UIView,
+  UIButton,
+  UIViewAttribute,
+  UIImageView,
+  UITableView,
+  UITextField
+} from "@/cocoa";
 import { Component, Vue } from "vue-property-decorator";
 import PropertiesPanel from "@/components/PropertiesPanel.vue";
 import ViewsPanel from "@/components/ViewsPanel.vue";
+import CodesPanel from "@/components/CodesPanel.vue";
 
 @Component({
   components: {
     PropertiesPanel,
-    ViewsPanel
+    ViewsPanel,
+    CodesPanel
   }
 })
 export default class Home extends Vue {
@@ -42,7 +55,23 @@ export default class Home extends Vue {
     subnodes: [
       {
         view: new UILabel(),
-        subnodes: [] as Node[]
+        subnodes: []
+      },
+      {
+        view: new UIButton(),
+        subnodes: []
+      },
+      {
+        view: new UIImageView(),
+        subnodes: []
+      },
+      {
+        view: new UITableView(),
+        subnodes: []
+      },
+      {
+        view: new UITextField(),
+        subnodes: []
       }
     ]
   };
@@ -91,6 +120,14 @@ export default class Home extends Vue {
 }
 
 .views-panel {
+  position: fixed;
+  top: 0;
+  right: 360px;
+  bottom: 0;
+  left: 300px;
+}
+
+.codes-panel {
   position: fixed;
   top: 0;
   right: 360px;

@@ -14,7 +14,11 @@ import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 export default class PropertyFormItem extends Vue {
   @Prop(Object) attribute!: UIViewAttribute;
 
-  value: any = this.getFromAttribute();
+  value: any = null;
+
+  created() {
+    this.value = this.getFromAttribute();
+  }
 
   getFromAttribute(): any {
     if (this.isText) {

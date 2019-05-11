@@ -1,8 +1,9 @@
 <template>
   <div class="properties-panel">
     <el-collapse v-model="activeNames">
+      <!-- 基本 -->
       <el-collapse-item title="基本" name="basic">
-        <el-form ref="form" label-width="80px" size="small">
+        <el-form ref="form" label-width="110px" size="small">
           <el-form-item label="类">
             <span class="static-text-value class-name">{{form.className}}</span>
           </el-form-item>
@@ -11,8 +12,10 @@
           </el-form-item>
         </el-form>
       </el-collapse-item>
+
+      <!-- 属性 -->
       <el-collapse-item title="属性" name="attributes">
-        <el-form ref="form" label-width="80px" size="small">
+        <el-form ref="form" label-width="110px" size="small">
           <property-form-item
             v-for="attribute in attributes"
             :key="attribute.key"
@@ -98,5 +101,13 @@ export default class PropertiesPanel extends Vue {
 .el-collapse-item {
   padding: 0px 20px 0 20px;
   border-bottom: 1px solid #ebeef5;
+}
+</style>
+
+<style lang="scss">
+.properties-panel {
+  .el-form-item__content {
+    width: 200px;
+  }
 }
 </style>

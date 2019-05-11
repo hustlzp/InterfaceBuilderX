@@ -13,6 +13,7 @@
   "main": "background.js",
   "dependencies": {
     "element-ui": "^2.7.0",
+    "highlight.js": "^9.15.6",
     "reflect-metadata": "^0.1.13",
     "uuid": "^3.3.2",
     "vue": "^2.6.6",
@@ -22,6 +23,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@types/highlight.js": "^9.12.3",
     "@types/uuid": "^3.4.4",
     "@vue/cli-plugin-babel": "^3.5.0",
     "@vue/cli-plugin-typescript": "^3.5.0",

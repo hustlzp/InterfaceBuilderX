@@ -10,6 +10,38 @@ export interface Node {
     subnodes: Node[]
 }
 
+export function codesForNode(node: Node): string {
+    let codes = viewCodesForNode(null, node)
+
+    codes += "\n\n// 约束\n\n"
+    codes += layoutCodesForNode(null, node)
+
+    return codes
+}
+
+function viewCodesForNode(supernode: Node | null, node: Node): string {
+    let codes = node.view.codes(supernode ? supernode.view : null)
+
+    // console.log(codes)
+    for (const subnode of node.subnodes) {
+        codes += "\n\n"
+        codes += viewCodesForNode(node, subnode)
+    }
+
+    return codes
+}
+
+function layoutCodesForNode(supernode: Node | null, node: Node): string {
+    let codes = node.view.layoutCodes(supernode ? supernode.view : null)
+
+    for (const subnode of node.subnodes) {
+        codes += "\n\n"
+        codes += layoutCodesForNode(node, subnode)
+    }
+
+    return codes
+}
+
 export class UIColor {
     r!: number
     g!: number
@@ -22,6 +54,9 @@ export class UIColor {
         this.b = b
         this.a = a
     }
+
+    static black: UIColor = new UIColor(0, 0, 0, 1)
+    static white: UIColor = new UIColor(255, 255, 255, 1)
 
     static fromHex(hex: string): UIColor | null {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -37,6 +72,10 @@ export class UIColor {
         var hex = c.toString(16);
 
         return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    codes(): string {
+        return `UIColor(hex: 0x${this.hex.replace('#', '')})`
     }
 }
 
@@ -62,7 +101,7 @@ export interface UIViewAttribute {
     type: any
 }
 
-function attribute(type: any, label: string) {
+export function attribute(type: any, label: string) {
     return (target: Object, propertyKey: string | symbol): void => {
         Reflect.defineMetadata('isAttribute', true, target, propertyKey)
         Reflect.defineMetadata('label', label, target, propertyKey)
@@ -81,7 +120,7 @@ export class UIView implements IRawParams {
     backgroundColor: UIColor | null = null
 
     get attributes(): UIViewAttribute[] {
-        console.log(Object.keys(this))
+        // console.log(Object.keys(this))
 
         return Object.keys(this).filter(k => Reflect.getMetadata('isAttribute', this, k)).map(k => {
             return {
@@ -92,40 +131,26 @@ export class UIView implements IRawParams {
             }
         })
     }
-}
 
-export class UILabel extends UIView {
-    name: string = "label"
-    className: string = "UILabel"
+    codes(superview: UIView | null): string {
+        let codes = `let ${this.name} = UIView()`
 
-    @attribute(String, "文本")
-    text: string | null = null
+        if (superview) {
+            codes += `\n${superview.name}.addSubview(${name})`
+        }
 
-    @attribute(UIColor, "文本颜色")
-    textColor: UIColor | null = null
-
-    @attribute(UIFont, "字体")
-    font: UIFont = UIFont.system(17)
-
-    constructor() {
-        super()
+        return codes
     }
-}
 
-export class UIButton extends UIView {
-    name: string = "button"
-    className: string = "UIButton"
+    layoutCodes(superview: UIView | null): string {
+        var codes = `${this.name}.snp.makeConstraints { (make) in`
 
-    @attribute(String, "文本")
-    title: string | null = null
+        if (superview) {
+            codes += `\n    make.edges.equalTo(${superview.name})`
+        }
 
-    @attribute(UIColor, "文本颜色")
-    titleColor: UIColor | null = null
+        codes += "\n}"
 
-    @attribute(UIFont, "字体")
-    font: UIFont = UIFont.system(17)
-
-    constructor() {
-        super()
+        return codes
     }
 }

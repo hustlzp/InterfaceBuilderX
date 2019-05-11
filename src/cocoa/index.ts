@@ -1,1 +1,6 @@
-export * from './uiview'
+export * from './UIView'
+export * from './UILabel'
+export * from './UIButton'
+export * from './UIImageView'
+export * from './UITableView'
+export * from './UITextField'
