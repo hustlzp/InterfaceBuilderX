@@ -6,6 +6,7 @@ interface IRawParams {
 }
 
 export interface Node {
+    id: string
     view: UIView
     subnodes: Node[]
 }

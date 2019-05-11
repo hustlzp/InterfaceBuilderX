@@ -3,6 +3,10 @@
     <el-tree
       class="view-tree"
       :data="[node]"
+      node-key="id"
+      draggable
+      ref="tree"
+      highlight-current
       :props="defaultProps"
       @node-click="handleNodeClick"
       default-expand-all
@@ -35,7 +39,8 @@ import {
   UITableView,
   UITextField
 } from "@/cocoa";
-import { Component, Vue } from "vue-property-decorator";
+import uuidv4 from "uuid/v4";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import PropertiesPanel from "@/components/PropertiesPanel.vue";
 import ViewsPanel from "@/components/ViewsPanel.vue";
 import CodesPanel from "@/components/CodesPanel.vue";
@@ -51,25 +56,31 @@ export default class Home extends Vue {
   selectedNode: Node | null = null;
 
   node: Node = {
+    id: uuidv4(),
     view: new UIView(),
     subnodes: [
       {
+        id: uuidv4(),
         view: new UILabel(),
         subnodes: []
       },
       {
+        id: uuidv4(),
         view: new UIButton(),
         subnodes: []
       },
       {
+        id: uuidv4(),
         view: new UIImageView(),
         subnodes: []
       },
       {
+        id: uuidv4(),
         view: new UITableView(),
         subnodes: []
       },
       {
+        id: uuidv4(),
         view: new UITextField(),
         subnodes: []
       }
@@ -85,6 +96,10 @@ export default class Home extends Vue {
 
   handleNodeClick(data: Node) {
     this.selectedNode = data;
+    // 解决需要点击两次才能 highlight 的 BUG
+    this.$nextTick(() => {
+      (this.$refs.tree as any).setCurrentKey(data.id);
+    });
   }
 
   didUpdateProperty(object: { key: string; value: any }) {
@@ -110,7 +125,7 @@ export default class Home extends Vue {
 
 <style lang="scss" scoped>
 .view-tree {
-  width: 300px;
+  width: 260px;
   position: fixed;
   top: 0;
   left: 0;
@@ -124,7 +139,7 @@ export default class Home extends Vue {
   top: 0;
   right: 360px;
   bottom: 0;
-  left: 300px;
+  left: 260px;
 }
 
 .codes-panel {
@@ -132,7 +147,7 @@ export default class Home extends Vue {
   top: 0;
   right: 360px;
   bottom: 0;
-  left: 300px;
+  left: 260px;
 }
 
 .properties-panel {
@@ -142,5 +157,19 @@ export default class Home extends Vue {
   right: 0;
   bottom: 0;
   border-left: 1px solid #dcdcdc;
+}
+</style>
+
+<style>
+.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+  font-weight: bold !important;
+  color: #000000;
+}
+
+.el-tree--highlight-current
+  .el-tree-node.is-drop-inner
+  > .el-tree-node__content {
+  background-color: #4d91f8 !important;
+  color: #fff;
 }
 </style>

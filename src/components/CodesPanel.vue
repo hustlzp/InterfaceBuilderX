@@ -34,6 +34,7 @@ export default class ViewsPanel extends Vue {
 
   copyCodes() {
     clipboard.writeText(this.codes);
+    this.$message("已复制");
   }
 
   get codes(): string {
