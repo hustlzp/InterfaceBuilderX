@@ -65,8 +65,7 @@ export default class Home extends Vue {
   views: UIView[] = [
     new UIView([
       new UILabel(),
-      new UIButton([new UIImageView(),]),
-      
+      new UIButton([new UIImageView()]),
       new UITableView(),
       new UITextField()
     ])

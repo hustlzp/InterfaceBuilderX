@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import uuidv4 from 'uuid/v4';
+import { capitalize, indent } from '@/utils';
 
 interface IRawParams {
     [key: string]: any
@@ -79,6 +80,7 @@ export class UIView implements IRawParams {
     name: string = "view"
     className: string = "UIView"
     subviews: UIView[] = []
+    isComponent: boolean = false
 
     constructor(subviews: UIView[] = []) {
         this.subviews = subviews
@@ -101,27 +103,97 @@ export class UIView implements IRawParams {
     }
 
     codes(): string {
-        let codes = this.viewCodes(null)
+        var codes = this.viewCodes(null)
 
-        codes += "\n\n// 约束\n\n"
-        codes += this.layoutCodes(null)
+        if (this.subviews.length > 0) {
+            codes += "\n\n// 约束"
+            codes += this.layoutCodes(null)
+        }
+
+        codes += "\n\n"
+        codes += this.componentCodes()
+
+        // 移除首尾换行
+        // 保证最多 2 个换行
+        codes = codes.trim().replace(/\n{3,}/g, '\n\n');
 
         return codes
     }
 
+    // 自身 View 代码
     selfViewCodes(): string {
         return `let ${this.name} = UIView()`
     }
 
+    // View 代码
     private viewCodes(superview: UIView | null): string {
-        let codes = this.selfViewCodes()
+        let codes = this.isComponent ?
+            `let ${this.name} = create${capitalize(this.name)}()` :
+            this.selfViewCodes()
 
         if (superview) {
-            codes += `\n${superview.name}.addSubview(${name})`
+            codes += `\n${superview.name}.addSubview(${this.name})`
         }
 
-        console.log(this)
-        console.log(this.subviews)
+        if (!this.isComponent) {
+            for (const subview of this.subviews) {
+                codes += "\n\n"
+                codes += subview.viewCodes(this)
+            }
+        }
+
+        return codes
+    }
+
+    // Layout 代码
+    private layoutCodes(superview: UIView | null): string {
+        var codes = ""
+
+        if (superview) {
+            codes += `${this.name}.snp.makeConstraints { (make) in`
+            codes += `\n    make.edges.equalTo(${superview.name})`
+            codes += "\n}"
+        }
+
+        if (!this.isComponent) {
+            for (const subview of this.subviews) {
+                codes += "\n\n"
+                codes += subview.layoutCodes(this)
+            }
+        }
+
+        return codes
+    }
+
+    // 组件函数代码
+    private componentCodes(): string {
+        var codes = ""
+
+        if (this.isComponent) {
+            codes += `private func create${capitalize(this.name)}() -> ${this.className} {`
+
+            codes += "\n"
+            codes += indent(this.viewCodesInComponent(), 4)
+
+            if (this.subviews.length > 0) {
+                codes += "\n\n    // 约束"
+                codes += indent(this.layoutCodesInComponent(), 4)
+            }
+
+            codes += indent(`\n\nreturn ${this.name}`, 4)
+            codes += "\n}"
+        }
+
+        for (const subview of this.subviews) {
+            codes += "\n\n"
+            codes += subview.componentCodes()
+        }
+
+        return codes
+    }
+
+    private viewCodesInComponent(): string {
+        let codes = this.selfViewCodes()
 
         for (const subview of this.subviews) {
             codes += "\n\n"
@@ -131,14 +203,8 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    private layoutCodes(superview: UIView | null): string {
-        var codes = `${this.name}.snp.makeConstraints { (make) in`
-
-        if (superview) {
-            codes += `\n    make.edges.equalTo(${superview.name})`
-        }
-
-        codes += "\n}"
+    private layoutCodesInComponent(): string {
+        var codes = ""
 
         for (const subview of this.subviews) {
             codes += "\n\n"

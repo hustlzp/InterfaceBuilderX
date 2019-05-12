@@ -10,6 +10,9 @@
           <el-form-item label="名称">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
+          <el-form-item label="组件化">
+            <el-checkbox v-model="form.isComponent"></el-checkbox>
+          </el-form-item>
         </el-form>
       </el-collapse-item>
 
@@ -45,7 +48,8 @@ export default class PropertiesPanel extends Vue {
 
   form = {
     name: this.view ? this.view.name : null,
-    className: this.view ? this.view.className : null
+    className: this.view ? this.view.className : null,
+    isComponent: this.view ? this.view.isComponent : false
   };
 
   didAttributeUpdate(val: any, attribute: UIViewAttribute) {
@@ -53,9 +57,10 @@ export default class PropertiesPanel extends Vue {
   }
 
   @Watch("view")
-  onNodeChanged(val: UIView | null, oldVal: UIView | null) {
+  onViewChanged(val: UIView | null, oldVal: UIView | null) {
     this.form.name = val ? val.name : null;
     this.form.className = val ? val.className : null;
+    this.form.isComponent = val ? val.isComponent : false;
 
     // let attributes = val ? val.attributes : [];
     // attributes.forEach(attribute => {
@@ -72,6 +77,11 @@ export default class PropertiesPanel extends Vue {
   @Watch("form.name")
   onNameUpdate(val: string) {
     this.$emit("update", { key: "name", value: val });
+  }
+
+  @Watch("form.isComponent")
+  onIsComponentUpdate(val: string) {
+    this.$emit("update", { key: "isComponent", value: val });
   }
 
   get attributes(): UIViewAttribute[] {
