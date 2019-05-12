@@ -31,7 +31,6 @@
 <script lang="ts">
 import uuidv4 from "uuid/v4";
 import {
-  Node,
   UIView,
   UILabel,
   UIButton,
@@ -83,9 +82,7 @@ export default class AddViewDialog extends Vue {
     let view = new this.form.viewClass();
     view.name = this.form.name;
 
-    let node = new Node(view);
-
-    this.$emit("create", node);
+    this.$emit("create", view);
     this.dialogVisible = false;
   }
 

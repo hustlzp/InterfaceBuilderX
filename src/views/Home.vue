@@ -3,7 +3,7 @@
     <div class="tree-panel" @contextmenu="showContextMenu">
       <el-tree
         class="view-tree"
-        :data="nodes"
+        :data="views"
         node-key="id"
         draggable
         ref="tree"
@@ -22,11 +22,11 @@
     </div>
 
     <!-- <views-panel :node="node"></views-panel> -->
-    <codes-panel :node="nodes.length > 0 ? nodes[0] : null"></codes-panel>
+    <codes-panel :view="views.length > 0 ? views[0] : null"></codes-panel>
 
-    <properties-panel :node="selectedNode" @update="didUpdateProperty"></properties-panel>
+    <properties-panel :view="selectedView" @update="didUpdateProperty"></properties-panel>
 
-    <add-view-dialog :visible.sync="addViewDialogVisible" @create="didCreateNode"></add-view-dialog>
+    <add-view-dialog :visible.sync="addViewDialogVisible" @create="didCreateView"></add-view-dialog>
   </div>
 </template>
 
@@ -35,7 +35,6 @@ const { remote } = require("electron");
 const { Menu, MenuItem } = remote;
 
 import {
-  Node,
   UILabel,
   UIView,
   UIButton,
@@ -50,7 +49,7 @@ import PropertiesPanel from "@/components/PropertiesPanel.vue";
 import ViewsPanel from "@/components/ViewsPanel.vue";
 import CodesPanel from "@/components/CodesPanel.vue";
 import AddViewDialog from "@/components/AddViewDialog.vue";
-import { ElTree } from "element-ui/types/tree";
+import { ElTree, TreeNode } from "element-ui/types/tree";
 
 @Component({
   components: {
@@ -61,76 +60,76 @@ import { ElTree } from "element-ui/types/tree";
   }
 })
 export default class Home extends Vue {
-  selectedNode: Node | null = null;
+  selectedView: UIView | null = null;
 
-  // nodes: Node[] = [
-  //   new Node(new UIView(), [
-  //     new Node(new UILabel()),
-  //     new Node(new UIButton()),
-  //     new Node(new UIImageView()),
-  //     new Node(new UITableView()),
-  //     new Node(new UITextField())
-  //   ])
-  // ];
-  nodes: Node[] = [];
+  views: UIView[] = [
+    new UIView([
+      new UILabel(),
+      new UIButton([new UIImageView(),]),
+      
+      new UITableView(),
+      new UITextField()
+    ])
+  ];
+  // views: UIView[] = [];
 
   defaultProps = {
-    label: (data: Node, node: any): string => {
-      return data.view.name;
+    label: (data: UIView, node: any): string => {
+      return data.name;
     },
-    children: "subnodes"
+    children: "subviews"
   };
 
   addViewDialogVisible: boolean = false;
 
-  handleNodeClick(data: Node) {
-    this.selectedNode = data;
+  handleNodeClick(data: UIView, node: TreeNode<string, UIView>) {
+    this.selectedView = data;
   }
 
   didUpdateProperty(object: { key: string; value: any }) {
     let { key, value } = object;
 
-    if (this.selectedNode) {
-      this.selectedNode.view[key] = value;
+    if (this.selectedView) {
+      this.selectedView[key] = value;
     }
   }
 
-  didCreateNode(node: Node) {
-    if (this.selectedNode) {
-      this.selectedNode.subnodes.push(node);
-    } else if (this.nodes.length > 0) {
-      this.nodes[0].subnodes.push(node);
+  didCreateView(view: UIView) {
+    if (this.selectedView) {
+      this.selectedView.subviews.push(view);
+    } else if (this.views.length > 0) {
+      this.views[0].subnodes.push(view);
     } else {
-      this.nodes.push(node);
+      this.views.push(view);
     }
 
-    this.selectedNode = node;
+    this.selectedView = view;
   }
 
   removeSelectedNode() {
-    if (!this.selectedNode) {
+    if (!this.selectedView) {
       return;
     }
 
     this.$confirm("确认删除？")
       .then(_ => {
-        if (this.selectedNode == this.nodes[0]) {
-          this.nodes = [];
-          this.selectedNode = null;
+        if (this.selectedView == this.views[0]) {
+          this.views = [];
+          this.selectedView = null;
           return;
         }
 
-        (this.$refs.tree as ElTree).remove(this.selectedNode);
+        (this.$refs.tree as ElTree).remove(this.selectedView);
       })
       .catch(_ => {});
   }
 
-  showContextMenu(event: any, data: Node) {
+  showContextMenu(event: any, view: UIView) {
     const menu = new Menu();
     let that = this;
 
-    if (data) {
-      this.selectedNode = data;
+    if (view) {
+      this.selectedView = view;
     }
 
     menu.append(
@@ -142,7 +141,7 @@ export default class Home extends Vue {
       })
     );
 
-    if (data) {
+    if (view) {
       menu.append(
         new MenuItem({
           label: "Remove",
@@ -156,7 +155,7 @@ export default class Home extends Vue {
     menu.popup({ window: remote.getCurrentWindow() });
   }
 
-  @Watch("selectedNode")
+  @Watch("selectedView")
   selectedNodeChanged() {
     this.setCurrentNode();
   }
@@ -168,11 +167,11 @@ export default class Home extends Vue {
 
   setCurrentNode() {
     this.$nextTick(() => {
-      if (!this.selectedNode) {
+      if (!this.selectedView) {
         return;
       }
 
-      (this.$refs.tree as ElTree).setCurrentKey(this.selectedNode.id);
+      (this.$refs.tree as ElTree).setCurrentKey(this.selectedView.id);
     });
   }
 }

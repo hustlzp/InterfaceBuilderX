@@ -1,23 +1,23 @@
 <template>
   <div class="views-panel">
     <div class="inner-wap">
-      <node :node="node"></node>
+      <view-render :view="view"></view-render>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { Node as NodeClass } from "@/cocoa";
-import NodeRender from "@/components/NodeRender.vue";
+import { UIView } from "@/cocoa";
+import ViewRender from "@/components/ViewRender.vue";
 
 @Component({
   components: {
-    node: NodeRender
+    viewRender: ViewRender
   }
 })
 export default class ViewsPanel extends Vue {
-  @Prop() node!: NodeClass;
+  @Prop() view!: UIView;
 }
 </script>
 

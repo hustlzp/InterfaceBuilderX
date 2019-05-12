@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Node, UIViewAttribute, UIView } from "@/cocoa";
+import { UIViewAttribute, UIView } from "@/cocoa";
 import PropertyFormItem from "@/components/PropertyFormItem.vue";
 
 @Component({
@@ -39,25 +39,25 @@ import PropertyFormItem from "@/components/PropertyFormItem.vue";
   }
 })
 export default class PropertiesPanel extends Vue {
-  @Prop(Node) node?: Node;
+  @Prop(UIView) view?: UIView;
 
   activeNames: string[] = ["basic", "attributes"];
 
   form = {
-    name: this.node ? this.node.view.name : null,
-    className: this.node ? this.node.view.className : null
+    name: this.view ? this.view.name : null,
+    className: this.view ? this.view.className : null
   };
 
   didAttributeUpdate(val: any, attribute: UIViewAttribute) {
     this.$emit("update", { key: attribute.key, value: val });
   }
 
-  @Watch("node")
-  onNodeChanged(val: Node | null, oldVal: Node | null) {
-    this.form.name = val ? val.view.name : null;
-    this.form.className = val ? val.view.className : null;
+  @Watch("view")
+  onNodeChanged(val: UIView | null, oldVal: UIView | null) {
+    this.form.name = val ? val.name : null;
+    this.form.className = val ? val.className : null;
 
-    // let attributes = val ? val.view.attributes : [];
+    // let attributes = val ? val.attributes : [];
     // attributes.forEach(attribute => {
     //   let type = attribute.type;
 
@@ -75,11 +75,7 @@ export default class PropertiesPanel extends Vue {
   }
 
   get attributes(): UIViewAttribute[] {
-    return this.node ? this.node.view.attributes : [];
-  }
-
-  get view(): UIView | null {
-    return this.node ? this.node.view : null;
+    return this.view ? this.view.attributes : [];
   }
 }
 </script>

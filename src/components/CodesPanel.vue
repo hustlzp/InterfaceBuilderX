@@ -13,17 +13,14 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { Node as NodeClass } from "@/cocoa";
-import NodeRender from "@/components/NodeRender.vue";
+import { UIView } from "@/cocoa";
 const { clipboard } = require("electron");
 
 @Component({
-  components: {
-    node: NodeRender
-  }
+  components: {}
 })
 export default class ViewsPanel extends Vue {
-  @Prop(NodeClass) node!: NodeClass | null;
+  @Prop(UIView) view!: UIView | null;
 
   copyCodes() {
     clipboard.writeText(this.codes);
@@ -31,7 +28,7 @@ export default class ViewsPanel extends Vue {
   }
 
   get codes(): string {
-    return this.node ? this.node.codes() : "";
+    return this.view ? this.view.codes() : "";
   }
 }
 </script>

@@ -5,48 +5,6 @@ interface IRawParams {
     [key: string]: any
 }
 
-export class Node {
-    id: string = uuidv4()
-    view!: UIView
-    subnodes: Node[] = []
-
-    constructor(view: UIView, subnodes: Node[] = []) {
-        this.view = view
-        this.subnodes = subnodes
-    }
-
-    codes(): string {
-        let codes = this.viewCodes(null)
-
-        codes += "\n\n// 约束\n\n"
-        codes += this.layoutCodes(null)
-
-        return codes
-    }
-
-    viewCodes(supernode: Node | null): string {
-        let codes = this.view.codes(supernode ? supernode.view : null)
-
-        for (const subnode of this.subnodes) {
-            codes += "\n\n"
-            codes += subnode.viewCodes(this)
-        }
-
-        return codes
-    }
-
-    layoutCodes(supernode: Node | null): string {
-        let codes = this.view.layoutCodes(supernode ? supernode.view : null)
-
-        for (const subnode of this.subnodes) {
-            codes += "\n\n"
-            codes += subnode.layoutCodes(this)
-        }
-
-        return codes
-    }
-}
-
 export class UIColor {
     r!: number
     g!: number
@@ -120,6 +78,11 @@ export class UIView implements IRawParams {
     id: string = uuidv4()
     name: string = "view"
     className: string = "UIView"
+    subviews: UIView[] = []
+
+    constructor(subviews: UIView[] = []) {
+        this.subviews = subviews
+    }
 
     @attribute(UIColor, "背景色")
     backgroundColor: UIColor | null = null
@@ -137,17 +100,38 @@ export class UIView implements IRawParams {
         })
     }
 
-    codes(superview: UIView | null): string {
-        let codes = `let ${this.name} = UIView()`
+    codes(): string {
+        let codes = this.viewCodes(null)
+
+        codes += "\n\n// 约束\n\n"
+        codes += this.layoutCodes(null)
+
+        return codes
+    }
+
+    selfViewCodes(): string {
+        return `let ${this.name} = UIView()`
+    }
+
+    private viewCodes(superview: UIView | null): string {
+        let codes = this.selfViewCodes()
 
         if (superview) {
             codes += `\n${superview.name}.addSubview(${name})`
         }
 
+        console.log(this)
+        console.log(this.subviews)
+
+        for (const subview of this.subviews) {
+            codes += "\n\n"
+            codes += subview.viewCodes(this)
+        }
+
         return codes
     }
 
-    layoutCodes(superview: UIView | null): string {
+    private layoutCodes(superview: UIView | null): string {
         var codes = `${this.name}.snp.makeConstraints { (make) in`
 
         if (superview) {
@@ -155,6 +139,11 @@ export class UIView implements IRawParams {
         }
 
         codes += "\n}"
+
+        for (const subview of this.subviews) {
+            codes += "\n\n"
+            codes += subview.layoutCodes(this)
+        }
 
         return codes
     }

@@ -1,24 +1,21 @@
 <template>
-  <component :is="component" :view="view" v-if="component">
-    <slot></slot>
-  </component>
+  <view-self-render :view="view">
+    <view-render :view="subview" :key="subview.id" v-for="subview in view.subviews"></view-render>
+  </view-self-render>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { Node, UIView } from "@/cocoa";
+import ViewSelfRender from "./ViewSelfRender.vue";
+import { UIView } from "@/cocoa";
 
-@Component
-export default class ViewRender extends Vue {
-  @Prop(UIView) view!: UIView;
-
-  component: any = null;
-
-  async mounted() {
-    this.component = (await import(`./cocoa/${
-      this.view.className
-    }.vue`)).default;
+@Component({
+  components: {
+    ViewSelfRender
   }
+})
+export default class ViewRender extends Vue {
+  @Prop() view!: UIView;
 }
 </script>
 

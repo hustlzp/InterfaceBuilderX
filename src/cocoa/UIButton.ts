@@ -16,11 +16,11 @@ export class UIButton extends UIView {
     @attribute(String, "Action")
     action: string | null = null
 
-    constructor() {
-        super()
-    }
+    // constructor() {
+    //     super()
+    // }
 
-    codes(superview: UIView): string {
+    selfViewCodes(): string {
         var codes = `let ${this.name} = UIButton()`
 
         // 标题
@@ -34,8 +34,7 @@ export class UIButton extends UIView {
         let action = this.action ? `#selector(${this.action})` : "nil"
         codes += `\n${this.name}.addTarget(self, action: ${action}, for: .touchUpInside)`
 
-        codes += `\n${superview.name}.addSubview(${this.name})`
-
         return codes
     }
+
 }
