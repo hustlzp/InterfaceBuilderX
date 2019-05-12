@@ -1,6 +1,6 @@
 <template>
   <div class="wap">
-    <el-input class="input-size" v-model.number="size"></el-input>
+    <el-input class="input-size" :id="attribute.key" v-model.number="size"></el-input>
     <el-select class="select-weight" v-model="weight" placeholder="请选择">
       <el-option v-for="weight in weightOptions" :key="weight" :label="weight" :value="weight"></el-option>
     </el-select>
@@ -9,10 +9,11 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { UIFont, UIFontWeight } from "../cocoa";
+import { UIFont, UIFontWeight, UIViewAttribute } from "../cocoa";
 
 @Component
 export default class FontPropertyFormItem extends Vue {
+  @Prop(Object) attribute!: UIViewAttribute;
   @Prop(UIFont) value!: UIFont | null;
 
   size: number = 17;

@@ -7,11 +7,11 @@
           <el-form-item label="类">
             <span class="static-text-value class-name">{{form.className}}</span>
           </el-form-item>
-          <el-form-item label="名称">
-            <el-input v-model="form.name"></el-input>
+          <el-form-item label="名称" for="name">
+            <el-input v-model="form.name" id="name"></el-input>
           </el-form-item>
-          <el-form-item label="组件化">
-            <el-checkbox v-model="form.isComponent"></el-checkbox>
+          <el-form-item for="is-component">
+            <el-checkbox v-model="form.isComponent" id="is-component">组件</el-checkbox>
           </el-form-item>
         </el-form>
       </el-collapse-item>

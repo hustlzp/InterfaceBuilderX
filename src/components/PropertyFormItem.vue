@@ -1,9 +1,9 @@
 <template>
-  <el-form-item :label="attribute.label">
-    <el-input v-if="isText" v-model="value"></el-input>
-    <el-input v-if="isNumber" v-model.number="value"></el-input>
-    <color-property-form-item v-if="isColor" v-model="value"></color-property-form-item>
-    <font-property-form-item v-if="isFont" v-model="value"></font-property-form-item>
+  <el-form-item :label="attribute.label" :for="attribute.key">
+    <el-input v-if="isText" v-model="value" :id="attribute.key"></el-input>
+    <el-input v-if="isNumber" v-model.number="value" :id="attribute.key"></el-input>
+    <color-property-form-item v-if="isColor" :attribute="attribute" v-model="value"></color-property-form-item>
+    <font-property-form-item v-if="isFont" :attribute="attribute" v-model="value"></font-property-form-item>
   </el-form-item>
 </template>
 

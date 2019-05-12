@@ -1,18 +1,25 @@
 <template>
   <div class="wap">
-    <el-input class="input-color-hex" :maxlength="6" :minlength="6" v-model="colorHex"></el-input>
+    <el-input
+      class="input-color-hex"
+      :id="attribute.key"
+      :maxlength="6"
+      :minlength="6"
+      v-model="colorHex"
+    ></el-input>
     <div class="color-preview" :style="colorPreviewStyle"></div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { UIColor } from "../cocoa";
+import { UIColor, UIViewAttribute } from "../cocoa";
 
 @Component({
   components: {}
 })
 export default class ColorPropertyFormItem extends Vue {
+  @Prop(Object) attribute!: UIViewAttribute;
   @Prop(UIColor) value!: UIColor | null;
 
   colorHex: string | null = null;
