@@ -26,11 +26,9 @@ export class UIButton extends UIView {
     @attribute(String, "Action")
     action: string | null = null
 
-    constructor(subviews: UIView[]) {
-        super(subviews)
-
-        this.watch
-    }
+    // constructor(subviews: UIView[]) {
+    //     super(subviews)
+    // }
 
     selfViewCodes(): string {
         var codes = `let ${this.name} = UIButton()`
