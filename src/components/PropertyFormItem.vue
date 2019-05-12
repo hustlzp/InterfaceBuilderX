@@ -2,15 +2,23 @@
   <el-form-item :label="attribute.label">
     <el-input v-if="isText" v-model="value"></el-input>
     <el-input v-if="isNumber" v-model.number="value"></el-input>
-    <el-color-picker v-if="isColor" v-model="value"></el-color-picker>
+    <color-property-form-item v-if="isColor" v-model="value"></color-property-form-item>
+    <font-property-form-item v-if="isFont" v-model="value"></font-property-form-item>
   </el-form-item>
 </template>
 
 <script lang="ts">
 import { UIView, UIViewAttribute, UIColor } from "@/cocoa";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import FontPropertyFormItem from "@/components/FontPropertyFormItem.vue";
+import ColorPropertyFormItem from "@/components/ColorPropertyFormItem.vue";
 
-@Component
+@Component({
+  components: {
+    FontPropertyFormItem,
+    ColorPropertyFormItem
+  }
+})
 export default class PropertyFormItem extends Vue {
   @Prop(Object) attribute!: UIViewAttribute;
 
@@ -26,11 +34,11 @@ export default class PropertyFormItem extends Vue {
     } else if (this.isNumber) {
       return this.attribute.value;
     } else if (this.isColor) {
-      return this.attribute.value
-        ? (this.attribute.value as UIColor).hex
-        : null;
+      return this.attribute.value;
+    } else if (this.isFont) {
+      return this.attribute.value;
     } else {
-      return null;
+      return this.attribute.value;
     }
   }
 
@@ -41,16 +49,16 @@ export default class PropertyFormItem extends Vue {
     } else if (this.isNumber) {
       this.$emit("update", val);
     } else if (this.isColor) {
-      this.$emit("update", UIColor.fromHex(val));
+      this.$emit("update", val);
     } else {
       this.$emit("update", val);
     }
   }
 
-  @Watch("attribute")
-  onAttributeChanged(val: any, oldVal: any) {
-    this.value = this.getFromAttribute();
-  }
+  // @Watch("attribute")
+  // onAttributeChanged(val: any, oldVal: any) {
+  //   this.value = this.getFromAttribute();
+  // }
 
   get isText(): boolean {
     return (
@@ -70,6 +78,13 @@ export default class PropertyFormItem extends Vue {
     return (
       typeof this.attribute.type == "function" &&
       this.attribute.type.name == "UIColor"
+    );
+  }
+
+  get isFont(): boolean {
+    return (
+      typeof this.attribute.type == "function" &&
+      this.attribute.type.name == "UIFont"
     );
   }
 }

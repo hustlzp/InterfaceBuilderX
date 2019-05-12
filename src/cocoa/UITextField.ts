@@ -26,8 +26,12 @@ export class UITextField extends UIView {
         codes += `\n${this.name}.placeholder = "${this.placeholder || ''}"`
         codes += `\n${this.name}.text = "${this.text || ''}"`
 
-        let colorCodes = (this.textColor || UIColor.black).codes()
-        codes += `\n${this.name}.textColor = ${colorCodes}`
+        if (this.textColor) {
+            codes += `\n${this.name}.textColor = ${this.textColor.codes}`
+        }
+
+        // font
+        codes += `\n${this.name}.font = ${this.font.codes}`
 
         return codes
     }

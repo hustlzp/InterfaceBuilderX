@@ -8,7 +8,7 @@ export class UILabel extends UIView {
     text: string | null = null
 
     @attribute(UIColor, "文本颜色")
-    textColor: UIColor | null = null
+    textColor: UIColor | null = UIColor.black
 
     @attribute(UIFont, "字体")
     font: UIFont = UIFont.system(17)
@@ -20,10 +20,15 @@ export class UILabel extends UIView {
     selfViewCodes(): string {
         let codes = `let ${this.name} = UILabel()`
 
+        // text
         codes += `\n${this.name}.text = "${this.text || ''}"`
 
-        let colorCodes = (this.textColor || UIColor.black).codes()
+        // textColor
+        let colorCodes = (this.textColor || UIColor.black).codes
         codes += `\n${this.name}.textColor = ${colorCodes}`
+
+        // font
+        codes += `\n${this.name}.font = ${this.font.codes}`
 
         return codes
     }

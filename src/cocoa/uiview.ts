@@ -38,23 +38,44 @@ export class UIColor {
         return hex.length == 1 ? "0" + hex : hex;
     }
 
-    codes(): string {
+    get codes(): string {
         return `UIColor(hex: 0x${this.hex.replace('#', '')})`
     }
+}
+
+export enum UIFontWeight {
+    ultraLight = "ultraLight",
+    light = "light",
+    regular = "regular",
+    medium = "medium",
+    semibold = "semibold",
+    bold = "bold",
+    heavy = "heavy",
+    black = "black"
 }
 
 export class UIFont {
     name?: string
     isSystem: boolean = true
     size: number = 17
+    weight: UIFontWeight = UIFontWeight.regular
 
     static system(size: number): UIFont {
         let font = new UIFont()
 
         font.isSystem = true
         font.size = size
+        font.weight = UIFontWeight.regular
 
         return font
+    }
+
+    get codes(): string {
+        if (this.weight == UIFontWeight.regular) {
+            return `UIFont.systemFont(ofSize: ${this.size})`
+        } else {
+            return `UIFont.systemFont(ofSize: ${this.size}, weight: .${this.weight})`
+        }
     }
 }
 
@@ -173,14 +194,14 @@ export class UIView implements IRawParams {
             codes += `private func create${capitalize(this.name)}() -> ${this.className} {`
 
             codes += "\n"
-            codes += indent(this.viewCodesInComponent(), 4)
+            codes += indent(this.viewCodesInComponent())
 
             if (this.subviews.length > 0) {
                 codes += "\n\n    // 约束"
-                codes += indent(this.layoutCodesInComponent(), 4)
+                codes += indent(this.layoutCodesInComponent())
             }
 
-            codes += indent(`\n\nreturn ${this.name}`, 4)
+            codes += indent(`\n\nreturn ${this.name}`)
             codes += "\n}"
         }
 

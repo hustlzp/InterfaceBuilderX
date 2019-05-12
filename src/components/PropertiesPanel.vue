@@ -21,7 +21,7 @@
         <el-form ref="form" label-width="110px" size="small">
           <property-form-item
             v-for="attribute in attributes"
-            :key="attribute.key"
+            :key="view.id + '.' + attribute.key"
             :attribute="attribute"
             @update="didAttributeUpdate($event, attribute)"
           ></property-form-item>

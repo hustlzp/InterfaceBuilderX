@@ -5,7 +5,7 @@ export function capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-export function indent(string: string, count = 1): string {
+export function indent(string: string, level = 1): string {
     let options = {
         indent: ' ',
         includeEmptyLines: false,
@@ -17,15 +17,15 @@ export function indent(string: string, count = 1): string {
         );
     }
 
-    if (typeof count !== 'number') {
+    if (typeof level !== 'number') {
         throw new TypeError(
-            `Expected \`count\` to be a \`number\`, got \`${typeof count}\``
+            `Expected \`count\` to be a \`number\`, got \`${typeof level}\``
         );
     }
 
-    if (count < 0) {
+    if (level < 0) {
         throw new RangeError(
-            `Expected \`count\` to be at least 0, got \`${count}\``
+            `Expected \`count\` to be at least 0, got \`${level}\``
         );
     }
 
@@ -35,11 +35,11 @@ export function indent(string: string, count = 1): string {
         );
     }
 
-    if (count === 0) {
+    if (level === 0) {
         return string;
     }
 
     const regex = options.includeEmptyLines ? /^/gm : /^(?!\s*$)/gm;
 
-    return string.replace(regex, options.indent.repeat(count));
+    return string.replace(regex, options.indent.repeat(level * 4));
 }
