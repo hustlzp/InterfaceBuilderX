@@ -126,7 +126,7 @@ export class UIView implements IRawParams {
     codes(): string {
         var codes = this.viewCodes(null)
 
-        if (this.subviews.length > 0) {
+        if (this.subviews.length > 0 && !this.isComponent) {
             codes += "\n\n// 约束"
             codes += this.layoutCodes(null)
         }
