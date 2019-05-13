@@ -29,7 +29,7 @@
       </el-collapse-item>
 
       <!-- Auto Layout -->
-      <el-collapse-item title="布局" name="autolayout">
+      <el-collapse-item title="约束" name="autolayout">
         <!-- <el-form ref="form" label-width="110px" size="small"> -->
         <!-- <property-form-item
             v-for="attribute in attributes"
@@ -163,7 +163,7 @@ export default class PropertiesPanel extends Vue {
   }
 
   .constraints-wap {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 
     .constraint {
       font-size: 15px;
