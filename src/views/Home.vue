@@ -106,25 +106,28 @@ export default class Home extends Vue {
       this.views.push(view);
     }
 
-    this.selectedView = view;
+    // this.selectedView = view;
   }
 
-  removeSelectedNode() {
+  async removeSelectedNode() {
     if (!this.selectedView) {
       return;
     }
 
-    this.$confirm("确认删除？")
-      .then(_ => {
-        if (this.selectedView == this.views[0]) {
-          this.views = [];
-          this.selectedView = null;
-          return;
-        }
+    try {
+      await this.$confirm("", "确认删除？");
+    } catch (err) {
+      return;
+    }
 
-        (this.$refs.tree as ElTree).remove(this.selectedView);
-      })
-      .catch(_ => {});
+    if (this.selectedView == this.views[0]) {
+      this.views = [];
+      this.selectedView = null;
+      return;
+    }
+
+    (this.$refs.tree as ElTree).remove(this.selectedView);
+    this.selectedView = null;
   }
 
   showContextMenu(event: any, view: UIView) {

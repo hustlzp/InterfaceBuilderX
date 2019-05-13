@@ -129,9 +129,9 @@ export default class PropertiesPanel extends Vue {
       return;
     }
 
-    let confirmed = await this.$confirm("确认删除？");
-
-    if (!confirmed) {
+    try {
+      await this.$confirm("", "确认删除？");
+    } catch (err) {
       return;
     }
 

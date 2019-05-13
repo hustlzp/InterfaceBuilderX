@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="(constraint ? 'Edit' : 'Add') +  ' Constraint'"
+    :title="title"
     append-to-body
     :visible.sync="dialogVisible"
     @open="initData"
@@ -199,6 +199,20 @@ export default class AddConstraintDialog extends Vue {
     this.form.toAttribute = null;
     this.form.multiplier = null;
     this.form.constant = null;
+  }
+
+  get title(): string {
+    var title = "";
+
+    if (this.view) {
+      title += `${this.view.name} `;
+    }
+
+    // title += this.constraint ? "Edit" : "Add";
+
+    // title += " Constraint";
+
+    return title;
   }
 
   @Watch("dialogVisible")
