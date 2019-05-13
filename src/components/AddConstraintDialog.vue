@@ -49,8 +49,19 @@
             :key="siblingView.id"
             :label="siblingView.name"
             :value="siblingView"
-          ></el-option>
-          <el-option v-if="view" label="self" :value="view"></el-option>
+          >
+            <span style="float: left">{{ siblingView.name }}</span>
+            <span
+              style="float: right; color: #ccc; font-size: 14px"
+              v-if="view && view.superview == siblingView"
+            >superview</span>
+          </el-option>
+          <el-option v-if="view" label="self" :value="view">
+            <span style="float: left">self</span>
+            <!-- <span
+              style="float: right; color: #ccc; font-size: 14px"
+            >self</span> -->
+          </el-option>
         </el-select>
         <el-select
           v-model="form.toAttribute"
