@@ -196,17 +196,6 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    // 自身 View 代码
-    selfViewCodes(): string {
-        let codes = `let ${this.name} = UIView()`
-
-        if (this.backgroundColor) {
-            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
-        }
-
-        return codes
-    }
-
     // View 代码
     private viewCodes(superview: UIView | null): string {
         let codes =
@@ -229,6 +218,37 @@ export class UIView implements IRawParams {
         return codes
     }
 
+    // Layout 代码
+    private layoutCodes(superview: UIView | null): string {
+        var codes = this.selfLayoutCodes()
+
+        if (!this.isComponent && !this.asFunction && !this.isComponentInstance) {
+            codes += this.subviewsLayoutCodes()
+        }
+
+        return codes
+    }
+
+    // 组件函数代码
+    private componentCodes(): string {
+        let codes = this.selfComponentCodes()
+
+        codes += this.subviewsComponentCodes()
+
+        return codes
+    }
+
+    // 自身 View 代码
+    private selfViewCodes(): string {
+        let codes = `let ${this.name} = UIView()`
+
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
+        return codes
+    }
+
     private selfLayoutCodes(): string {
         let codes = ""
 
@@ -241,17 +261,6 @@ export class UIView implements IRawParams {
             }
 
             codes += "\n}"
-        }
-
-        return codes
-    }
-
-    // Layout 代码
-    private layoutCodes(superview: UIView | null): string {
-        var codes = this.selfLayoutCodes()
-
-        if (!this.isComponent && !this.asFunction && !this.isComponentInstance) {
-            codes += this.subviewsLayoutCodes()
         }
 
         return codes
@@ -288,19 +297,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    // 组件函数代码
-    private componentCodes(): string {
-        let codes = this.selfComponentCodes()
-
-        for (const subview of this.subviews) {
-            codes += "\n\n"
-            codes += subview.componentCodes()
-        }
-
-        return codes
-    }
-
-    subviewsViewCodes(): string {
+    private subviewsViewCodes(): string {
         let codes = ""
 
         for (const subview of this.subviews) {
@@ -311,12 +308,23 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    subviewsLayoutCodes(): string {
+    private subviewsLayoutCodes(): string {
         var codes = ""
 
         for (const subview of this.subviews) {
             codes += "\n\n"
             codes += subview.layoutCodes(this)
+        }
+
+        return codes
+    }
+
+    private subviewsComponentCodes(): string {
+        var codes = ""
+
+        for (const subview of this.subviews) {
+            codes += "\n\n"
+            codes += subview.componentCodes()
         }
 
         return codes
