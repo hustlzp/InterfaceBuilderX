@@ -207,7 +207,7 @@ export default class PropertiesPanel extends Vue {
 
     .constraint {
       font-size: 13px;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
       background-color: #f4f4f5;
       border: 1px solid #eeeeee;
       border-radius: 4px;

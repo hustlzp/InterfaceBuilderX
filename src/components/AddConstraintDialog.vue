@@ -9,8 +9,7 @@
     class="dialog"
   >
     <el-form :model="form" label-width="95px" label-position="right">
-      <el-form-item label="View" v-if="view">
-        <el-input :value="view.name" disabled class="input-view"></el-input>
+      <el-form-item label="Attribute">
         <el-select
           ref="selectAttribute"
           class="select-attribute"
@@ -64,6 +63,7 @@
           placeholder="请选择"
           filterable
         >
+          <el-option label :value="null"></el-option>
           <el-option
             v-for="attribute in attributes"
             :key="attribute"
@@ -189,7 +189,7 @@ export default class AddConstraintDialog extends Vue {
   }
 
   opened() {
-    (this.$refs.selectAttribute as ElSelect).focus();
+    // (this.$refs.selectAttribute as ElSelect).focus();
   }
 
   resetData() {
