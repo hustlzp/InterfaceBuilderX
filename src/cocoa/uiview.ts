@@ -1,9 +1,7 @@
 import "reflect-metadata";
 import uuidv4 from 'uuid/v4';
 import { capitalize, indent, IRawParams } from '@/utils';
-import { AutoLayoutAttribute, AutoLayoutConstraint, AutoLayoutRelation } from '@/cocoa/AutoLayout'
-
-
+import { AutoLayoutConstraint, AutoLayoutRelation } from '@/cocoa/AutoLayout'
 
 export class UIColor {
     r!: number
@@ -101,8 +99,18 @@ export class UIView implements IRawParams {
     className: string = "UIView"
     subviews: UIView[] = []
     superview: UIView | null = null
-    isComponent: boolean = false
     constraints: AutoLayoutConstraint[] = []
+
+    // 是否为组件
+    isComponent: boolean = false
+    // 组件名称
+    componentName: string | null = null
+    componentInstances: UIView[] = []
+
+    // 是否为组件实例
+    isComponentInstance: boolean = false
+    // 所属的组件
+    component: UIView | null = null
 
     constructor(subviews: UIView[] = []) {
         this.subviews = subviews
@@ -114,6 +122,10 @@ export class UIView implements IRawParams {
 
     @attribute(UIColor, "背景色")
     backgroundColor: UIColor | null = null
+
+    get isRoot(): boolean {
+        return this.superview == null
+    }
 
     get attributes(): UIViewAttribute[] {
         // console.log(Object.keys(this))
@@ -128,12 +140,6 @@ export class UIView implements IRawParams {
         })
     }
 
-    // addConstraint(attribute: AutoLayoutAttribute, relation: AutoLayoutRelation, toView: UIView | null, toAttribute: AutoLayoutAttribute | null, multiplier: number | null, constant: number | null) {
-    //     let constraint = new AutoLayoutConstraint(this, attribute, relation, toView, toAttribute, multiplier, constant)
-
-    //     this.constraints.push(constraint)
-    // }
-
     addConstraint(constraint: AutoLayoutConstraint) {
         this.constraints.push(constraint)
     }
@@ -147,8 +153,28 @@ export class UIView implements IRawParams {
         this.constraints = this.constraints.map(c => c.id == constraint.id ? constraint : c)
     }
 
+    allSubviews(): UIView[] {
+        let subviews: UIView[] = []
+
+        this.subviewIterator((view) => {
+            subviews.push(view)
+        })
+
+        return subviews
+    }
+
+    subviewIterator(callback: (view: UIView) => void): void {
+        for (const subview of this.subviews) {
+            callback(subview)
+
+            if (subview.subviews.length > 0) {
+                subview.subviewIterator(callback)
+            }
+        }
+    }
+
     codes(): string {
-        var codes = this.viewCodes(null)
+        var codes = this.isComponent ? "" : this.viewCodes(null)
 
         if (this.subviews.length > 0 && !this.isComponent) {
             codes += "\n\n// 约束"
@@ -167,20 +193,29 @@ export class UIView implements IRawParams {
 
     // 自身 View 代码
     selfViewCodes(): string {
-        return `let ${this.name} = UIView()`
+        let codes = `let ${this.name} = UIView()`
+
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
+        return codes
     }
 
     // View 代码
     private viewCodes(superview: UIView | null): string {
-        let codes = this.isComponent ?
-            `let ${this.name} = create${capitalize(this.name)}()` :
-            this.selfViewCodes()
+        let codes =
+            this.isComponent ?
+                `let ${this.name} = create${capitalize(this.componentName!)}()` :
+                this.isComponentInstance ?
+                    `let ${this.name} = create${capitalize(this.component!.componentName!)}()` :
+                    this.selfViewCodes()
 
         if (superview) {
             codes += `\n${superview.name}.addSubview(${this.name})`
         }
 
-        if (!this.isComponent) {
+        if (!this.isComponent && !this.isComponentInstance) {
             for (const subview of this.subviews) {
                 codes += "\n\n"
                 codes += subview.viewCodes(this)
@@ -210,7 +245,7 @@ export class UIView implements IRawParams {
         //     codes += "\n}"
         // }
 
-        if (!this.isComponent) {
+        if (!this.isComponent && !this.isComponentInstance) {
             for (const subview of this.subviews) {
                 codes += "\n\n"
                 codes += subview.layoutCodes(this)
@@ -225,7 +260,8 @@ export class UIView implements IRawParams {
         var codes = ""
 
         if (this.isComponent) {
-            codes += `private func create${capitalize(this.name)}() -> ${this.className} {`
+            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+            codes += `private func create${componentName}() -> ${this.className} {`
 
             codes += "\n"
             codes += indent(this.viewCodesInComponent())
@@ -247,7 +283,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    private viewCodesInComponent(): string {
+    viewCodesInComponent(): string {
         let codes = this.selfViewCodes()
 
         for (const subview of this.subviews) {
@@ -258,7 +294,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    private layoutCodesInComponent(): string {
+    layoutCodesInComponent(): string {
         var codes = ""
 
         for (const subview of this.subviews) {

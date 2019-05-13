@@ -15,8 +15,13 @@
         :empty-text="null"
         @node-contextmenu="showContextMenu"
       >
-        <span class="custom-tree-node" slot-scope="{ node }">
-          <span>{{ node.label }}</span>
+        <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span class="node-label">{{ node.label }}</span>
+          <span v-if="data.isComponent" class="component-flag">{{data.componentName}}</span>
+          <span
+            v-if="data.isComponentInstance"
+            class="component-instance-flag"
+          >{{data.component.componentName}}</span>
         </span>
       </el-tree>
     </div>
@@ -31,6 +36,11 @@
     ></properties-panel>
 
     <add-view-dialog :visible.sync="addViewDialogVisible" @create="didCreateView"></add-view-dialog>
+    <add-component-instance-dialog
+      :visible.sync="addComponentInstanceDialogVisible"
+      :components="components"
+      @create="didCreateComponentInstance"
+    ></add-component-instance-dialog>
   </div>
 </template>
 
@@ -53,6 +63,7 @@ import PropertiesPanel from "@/components/PropertiesPanel.vue";
 import ViewsPanel from "@/components/ViewsPanel.vue";
 import CodesPanel from "@/components/CodesPanel.vue";
 import AddViewDialog from "@/components/AddViewDialog.vue";
+import AddComponentInstanceDialog from "@/components/AddComponentInstanceDialog.vue";
 import { ElTree, TreeNode } from "element-ui/types/tree";
 
 @Component({
@@ -60,7 +71,8 @@ import { ElTree, TreeNode } from "element-ui/types/tree";
     PropertiesPanel,
     ViewsPanel,
     CodesPanel,
-    AddViewDialog
+    AddViewDialog,
+    AddComponentInstanceDialog
   }
 })
 export default class Home extends Vue {
@@ -83,7 +95,8 @@ export default class Home extends Vue {
     children: "subviews"
   };
 
-  addViewDialogVisible: boolean = false;
+  addViewDialogVisible = false;
+  addComponentInstanceDialogVisible = false;
 
   handleNodeClick(data: UIView, node: TreeNode<string, UIView>) {
     this.selectedView = data;
@@ -94,6 +107,15 @@ export default class Home extends Vue {
 
     if (this.selectedView) {
       this.selectedView[key] = value;
+
+      if (key == "isComponent" && !value) {
+        // 取消组件
+        this.selectedView.componentInstances.forEach(instance => {
+          instance.isComponentInstance = false;
+          instance.component = null;
+        });
+        this.selectedView.componentInstances = [];
+      }
     }
   }
 
@@ -109,13 +131,26 @@ export default class Home extends Vue {
     // this.selectedView = view;
   }
 
+  didCreateComponentInstance(view: UIView) {
+    if (this.selectedView) {
+      this.selectedView.subviews.push(view);
+    } else if (this.views.length > 0) {
+      this.views[0].subviews.push(view);
+    } else {
+      this.views.push(view);
+    }
+  }
+
   async removeSelectedNode() {
     if (!this.selectedView) {
       return;
     }
 
     try {
-      await this.$confirm("", "确认删除？");
+      await this.$confirm(
+        "",
+        `确认删除${this.selectedView.isComponent ? "组件" : " View"}？`
+      );
     } catch (err) {
       return;
     }
@@ -124,6 +159,15 @@ export default class Home extends Vue {
       this.views = [];
       this.selectedView = null;
       return;
+    }
+
+    // 取消组件
+    if (this.selectedView.isComponent) {
+      this.selectedView.componentInstances.forEach(instance => {
+        instance.isComponentInstance = false;
+        instance.component = null;
+      });
+      this.selectedView.componentInstances = [];
     }
 
     (this.$refs.tree as ElTree).remove(this.selectedView);
@@ -138,14 +182,30 @@ export default class Home extends Vue {
       this.selectedView = view;
     }
 
-    menu.append(
-      new MenuItem({
-        label: "Add Subview",
-        click() {
-          that.addViewDialogVisible = true;
-        }
-      })
-    );
+    if (!this.selectedView || !this.selectedView.isComponentInstance) {
+      menu.append(
+        new MenuItem({
+          label: "Add Subview",
+          click() {
+            that.addViewDialogVisible = true;
+          }
+        })
+      );
+    }
+
+    if (
+      !this.selectedView ||
+      (!this.selectedView.isComponentInstance && !this.selectedView.isComponent)
+    ) {
+      menu.append(
+        new MenuItem({
+          label: "Add Component Instance",
+          click() {
+            that.addComponentInstanceDialogVisible = true;
+          }
+        })
+      );
+    }
 
     if (view) {
       menu.append(
@@ -183,6 +243,12 @@ export default class Home extends Vue {
     });
 
     return siblingViews;
+  }
+
+  get components(): UIView[] {
+    return this.views.length > 0
+      ? this.views[0].allSubviews().filter(subview => subview.isComponent)
+      : [];
   }
 
   @Watch("selectedView")
@@ -250,18 +316,46 @@ export default class Home extends Vue {
   bottom: 0;
   border-left: 1px solid #dcdcdc;
 }
+
+.custom-tree-node {
+  // flex: 1;
+  // display: flex;
+  // justify-content: space-between;
+}
+
+.component-flag,
+.component-instance-flag {
+  font-size: 13px;
+  background-color: #f4f4f5;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-weight: bold;
+  margin-left: 6px;
+  font-family: "SFMono-Regular", "monospace";
+}
+
+.component-instance-flag {
+  font-weight: normal;
+}
 </style>
 
-<style>
+<style lang="scss">
 .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
   font-weight: bold !important;
-  color: #000000;
+
+  .node-label {
+    color: #000000;
+  }
 }
 
 .el-tree--highlight-current
   .el-tree-node.is-drop-inner
   > .el-tree-node__content {
   background-color: #4d91f8 !important;
-  color: #fff;
+
+  .node-label {
+    color: #fff;
+  }
 }
 </style>

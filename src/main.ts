@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import filters from './filters'
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -14,6 +15,10 @@ hljs.registerLanguage('swift', swift);
 Vue.config.productionTip = false
 
 Vue.use(ElementUI);
+
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
 Vue.directive('highlightjs', {
   bind: function (el, binding) {

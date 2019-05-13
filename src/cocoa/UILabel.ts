@@ -27,6 +27,10 @@ export class UILabel extends UIView {
         let colorCodes = (this.textColor || UIColor.black).codes
         codes += `\n${this.name}.textColor = ${colorCodes}`
 
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
         // font
         codes += `\n${this.name}.font = ${this.font.codes}`
 

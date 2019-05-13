@@ -11,6 +11,10 @@ export class UIImageView extends UIView {
     selfViewCodes(): string {
         let codes = `let ${this.name} = UIImageView()`
 
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
         return codes
     }
 }

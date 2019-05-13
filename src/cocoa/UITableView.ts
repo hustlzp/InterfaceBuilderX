@@ -21,8 +21,13 @@ export class UITableView extends UIView {
     // }
 
     selfViewCodes(): string {
-        let codes = `let ${this.name} = UITableView()
-${this.name}.delegate = self
+        let codes = `let ${this.name} = UITableView()`
+
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
+        codes += `\n${this.name}.delegate = self
 tableView.dataSource = self
 tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: ${this.footerHeight || 0}))
 tableView.estimatedRowHeight = ${this.estimatedRowHeight}

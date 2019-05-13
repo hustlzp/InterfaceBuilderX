@@ -40,6 +40,10 @@ export class UIButton extends UIView {
         let colorCodes = (this.titleColor || UIColor.black).codes
         codes += `\n${this.name}.setTitleColor(${colorCodes}, for: .normal)`
 
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+        
         // Action
         let action = this.action ? `#selector(${this.action})` : "nil"
         codes += `\n${this.name}.addTarget(self, action: ${action}, for: .touchUpInside)`

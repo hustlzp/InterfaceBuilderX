@@ -30,6 +30,10 @@ export class UITextField extends UIView {
             codes += `\n${this.name}.textColor = ${this.textColor.codes}`
         }
 
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
         // font
         codes += `\n${this.name}.font = ${this.font.codes}`
 

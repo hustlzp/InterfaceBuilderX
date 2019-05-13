@@ -8,16 +8,27 @@
             <span class="static-text-value class-name">{{form.className}}</span>
           </el-form-item>
           <el-form-item label="名称" for="name">
-            <el-input v-model="form.name" id="name"></el-input>
+            <el-input v-model="form.name" @input="onNameInput" id="name"></el-input>
           </el-form-item>
-          <el-form-item for="is-component">
-            <el-checkbox v-model="form.isComponent" id="is-component">组件</el-checkbox>
+          <el-form-item for="is-component" v-if="view && !view.isComponentInstance">
+            <el-checkbox v-model="form.isComponent" @input="onIsComponentInput" id="is-component">组件</el-checkbox>
+          </el-form-item>
+          <el-form-item
+            label="组件名"
+            for="component-name"
+            v-if="view && view.isComponent && view.superview"
+          >
+            <el-input
+              :value="form.componentName|capitalize"
+              @input="onComponentNameInput"
+              id="component-name"
+            ></el-input>
           </el-form-item>
         </el-form>
       </el-collapse-item>
 
       <!-- 属性 -->
-      <el-collapse-item title="属性" name="attributes">
+      <el-collapse-item title="属性" name="attributes" v-if="view && !view.isComponentInstance">
         <el-form ref="form" label-width="110px" size="small">
           <property-form-item
             v-for="attribute in attributes"
@@ -28,8 +39,8 @@
         </el-form>
       </el-collapse-item>
 
-      <!-- Auto Layout -->
-      <el-collapse-item title="约束" name="autolayout">
+      <!-- 约束 -->
+      <el-collapse-item title="约束" name="constraints">
         <div class="constraints-wap" v-if="view && view.constraints.length > 0">
           <div class="constraint" v-for="constraint in view.constraints" :key="constraint.id">
             {{view.constraintCodesForDisplay(constraint)}}
@@ -69,9 +80,17 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { capitalize } from "@/utils";
 import { UIViewAttribute, UIView, AutoLayoutConstraint } from "@/cocoa";
 import PropertyFormItem from "@/components/PropertyFormItem.vue";
 import AddConstraintDialog from "@/components/AddConstraintDialog.vue";
+
+interface Form {
+  name: string | null;
+  className: string | null;
+  isComponent: boolean;
+  componentName: string | null;
+}
 
 @Component({
   components: {
@@ -83,13 +102,21 @@ export default class PropertiesPanel extends Vue {
   @Prop(UIView) view!: UIView | null;
   @Prop(Array) siblingViews!: UIView[];
 
-  activeNames: string[] = ["basic", "attributes", "autolayout"];
+  activeNames: string[] = ["basic", "attributes", "constraints"];
 
-  form = {
-    name: this.view ? this.view.name : null,
-    className: this.view ? this.view.className : null,
-    isComponent: this.view ? this.view.isComponent : false
+  form: Form = {
+    name: null,
+    className: null,
+    isComponent: false,
+    componentName: null
   };
+
+  created() {
+    this.form.name = this.view ? this.view.name : null;
+    this.form.className = this.view ? this.view.className : null;
+    this.form.isComponent = this.view ? this.view.isComponent : false;
+    this.form.componentName = this.view ? this.view.componentName : null;
+  }
 
   addConstraintDialogVisible: boolean = false;
   constraintToUpdate: AutoLayoutConstraint | null = null;
@@ -147,27 +174,30 @@ export default class PropertiesPanel extends Vue {
     this.form.name = val ? val.name : null;
     this.form.className = val ? val.className : null;
     this.form.isComponent = val ? val.isComponent : false;
-
-    // let attributes = val ? val.attributes : [];
-    // attributes.forEach(attribute => {
-    //   let type = attribute.type;
-
-    //   if (typeof type == "function") {
-    //     console.log(type.name);
-    //   } else {
-    //     console.log(type);
-    //   }
-    // });
   }
 
-  @Watch("form.name")
-  onNameUpdate(val: string) {
+  onNameInput(val: string) {
     this.$emit("update", { key: "name", value: val });
   }
 
-  @Watch("form.isComponent")
-  onIsComponentUpdate(val: string) {
+  onIsComponentInput(val: string) {
     this.$emit("update", { key: "isComponent", value: val });
+
+    if (this.view) {
+      this.form.componentName = val ? capitalize(this.view.name) : null;
+      this.$emit("update", {
+        key: "componentName",
+        value: this.form.componentName
+      });
+    }
+  }
+
+  onComponentNameInput(val: string) {
+    this.form.componentName = capitalize(val);
+    this.$emit("update", {
+      key: "componentName",
+      value: this.form.componentName
+    });
   }
 
   get attributes(): UIViewAttribute[] {
