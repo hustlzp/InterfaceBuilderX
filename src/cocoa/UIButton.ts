@@ -34,7 +34,7 @@ export class UIButton extends UIView {
         var codes = `let ${this.name} = UIButton()`
 
         // 标题
-        codes += `\n${this.name}.setTitle("${this.title || ""}", for: .normal)`
+        codes += `\n${this.name}.setTitle("${this.title || ""}".localized(), for: .normal)`
 
         // 颜色
         let colorCodes = (this.titleColor || UIColor.black).codes

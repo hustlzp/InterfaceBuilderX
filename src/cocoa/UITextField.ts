@@ -23,8 +23,8 @@ export class UITextField extends UIView {
     selfViewCodes(): string {
         let codes = `let ${this.name} = UITextField()`
 
-        codes += `\n${this.name}.placeholder = "${this.placeholder || ''}"`
-        codes += `\n${this.name}.text = "${this.text || ''}"`
+        codes += `\n${this.name}.placeholder = "${this.placeholder || ''}".localized()`
+        codes += `\n${this.name}.text = "${this.text || ''}".localized()`
 
         if (this.textColor) {
             codes += `\n${this.name}.textColor = ${this.textColor.codes}`

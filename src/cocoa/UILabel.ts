@@ -21,7 +21,7 @@ export class UILabel extends UIView {
         let codes = `let ${this.name} = UILabel()`
 
         // text
-        codes += `\n${this.name}.text = "${this.text || ''}"`
+        codes += `\n${this.name}.text = "${this.text || ''}".localized()`
 
         // textColor
         let colorCodes = (this.textColor || UIColor.black).codes
