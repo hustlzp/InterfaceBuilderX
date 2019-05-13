@@ -179,6 +179,7 @@ export default class PropertiesPanel extends Vue {
     this.form.name = val ? val.name : null;
     this.form.className = val ? val.className : null;
     this.form.isComponent = val ? val.isComponent : false;
+    this.form.componentName = val ? val.componentName : null;
   }
 
   onNameInput(val: string) {
