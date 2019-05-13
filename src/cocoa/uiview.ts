@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import uuidv4 from 'uuid/v4';
 import { capitalize, indent } from '@/utils';
+import { AutoLayoutAttribute, AutoLayoutConstraint, AutoLayoutRelation } from '@/cocoa/AutoLayout'
 
 interface IRawParams {
     [key: string]: any
@@ -101,10 +102,16 @@ export class UIView implements IRawParams {
     name: string = "view"
     className: string = "UIView"
     subviews: UIView[] = []
+    superview: UIView | null = null
     isComponent: boolean = false
+    constraints: AutoLayoutConstraint[] = []
 
     constructor(subviews: UIView[] = []) {
         this.subviews = subviews
+
+        subviews.forEach(subview => {
+            subview.superview = this
+        })
     }
 
     @attribute(UIColor, "背景色")
@@ -121,6 +128,16 @@ export class UIView implements IRawParams {
                 type: Reflect.getMetadata("design:type", this, k)
             }
         })
+    }
+
+    // addConstraint(attribute: AutoLayoutAttribute, relation: AutoLayoutRelation, toView: UIView | null, toAttribute: AutoLayoutAttribute | null, multiplier: number | null, constant: number | null) {
+    //     let constraint = new AutoLayoutConstraint(this, attribute, relation, toView, toAttribute, multiplier, constant)
+
+    //     this.constraints.push(constraint)
+    // }
+
+    addConstraint(constraint: AutoLayoutConstraint) {
+        this.constraints.push(constraint)
     }
 
     codes(): string {
@@ -170,11 +187,21 @@ export class UIView implements IRawParams {
     private layoutCodes(superview: UIView | null): string {
         var codes = ""
 
-        if (superview) {
+        // 自身约束代码
+        if (this.constraints.length > 0) {
             codes += `${this.name}.snp.makeConstraints { (make) in`
-            codes += `\n    make.edges.equalTo(${superview.name})`
+
+            for (const constraint of this.constraints) {
+                codes += `\n    make.${this.constraintCodes(constraint)}`
+            }
+
             codes += "\n}"
         }
+        // if (superview) {
+        //     codes += `${this.name}.snp.makeConstraints { (make) in`
+        //     codes += `\n    make.edges.equalTo(${superview.name})`
+        //     codes += "\n}"
+        // }
 
         if (!this.isComponent) {
             for (const subview of this.subviews) {
@@ -230,6 +257,88 @@ export class UIView implements IRawParams {
         for (const subview of this.subviews) {
             codes += "\n\n"
             codes += subview.layoutCodes(this)
+        }
+
+        return codes
+    }
+
+    private constraintCodes(constraint: AutoLayoutConstraint): string {
+        var codes = `${constraint.attribute}`
+
+        var relationName = ""
+        switch (constraint.relation) {
+            case AutoLayoutRelation.equal:
+                relationName = "equalTo"
+                break
+            case AutoLayoutRelation.lessThanOrEqual:
+                relationName = "lessThanOrEqualTo"
+                break
+            case AutoLayoutRelation.greaterThanOrEqual:
+                relationName = "greaterThanOrEqualTo"
+                break
+        }
+        codes += `.${relationName}`
+
+        if (constraint.toView) {
+            let toViewName = constraint.toView == this ? "self" : constraint.toView.name
+            codes += `(${toViewName}`
+
+            if (constraint.toAttribute) {
+                codes += `.${constraint.toAttribute})`
+            } else {
+                codes += ")"
+            }
+
+            if (constraint.constant) {
+                codes += `.offset(${constraint.constant})`
+            }
+        } else if (constraint.constant) {
+            codes += `(${constraint.constant})`
+        }
+
+        if (constraint.multiplier) {
+            codes += `.multipliedBy(${constraint.multiplier})`
+        }
+
+        return codes
+    }
+
+    private constraintCodesForDisplay(constraint: AutoLayoutConstraint): string {
+        var codes = `${constraint.attribute}`
+
+        var relationName = ""
+        switch (constraint.relation) {
+            case AutoLayoutRelation.equal:
+                relationName = "="
+                break
+            case AutoLayoutRelation.lessThanOrEqual:
+                relationName = "<="
+                break
+            case AutoLayoutRelation.greaterThanOrEqual:
+                relationName = ">="
+                break
+        }
+        codes += ` ${relationName}`
+
+        if (constraint.toView) {
+            let toViewName = constraint.toView == this ? "self" : constraint.toView.name
+            codes += ` ${toViewName}`
+
+            if (constraint.toAttribute) {
+                codes += `.${constraint.toAttribute})`
+            } else {
+                codes += ""
+            }
+
+            if (constraint.constant) {
+                codes += ` + ${constraint.constant}`
+            }
+        } else if (constraint.constant) {
+            codes += ` ${constraint.constant}`
+        }
+
+        if (constraint.multiplier) {
+            codes += ` * ${constraint.multiplier}`
         }
 
         return codes
