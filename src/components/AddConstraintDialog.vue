@@ -208,9 +208,7 @@ export default class AddConstraintDialog extends Vue {
       title += `${this.view.name} `;
     }
 
-    // title += this.constraint ? "Edit" : "Add";
-
-    // title += " Constraint";
+    // title += this.constraint ? "Edit Constraint" : "Add Constraint";
 
     return title;
   }
