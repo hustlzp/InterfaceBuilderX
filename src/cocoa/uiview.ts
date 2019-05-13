@@ -1,11 +1,9 @@
 import "reflect-metadata";
 import uuidv4 from 'uuid/v4';
-import { capitalize, indent } from '@/utils';
+import { capitalize, indent, IRawParams } from '@/utils';
 import { AutoLayoutAttribute, AutoLayoutConstraint, AutoLayoutRelation } from '@/cocoa/AutoLayout'
 
-interface IRawParams {
-    [key: string]: any
-}
+
 
 export class UIColor {
     r!: number
@@ -138,6 +136,15 @@ export class UIView implements IRawParams {
 
     addConstraint(constraint: AutoLayoutConstraint) {
         this.constraints.push(constraint)
+    }
+
+    removeConstraint(constraint: AutoLayoutConstraint) {
+        this.constraints = this.constraints.filter(c => c.id != constraint.id)
+    }
+
+    updateConstraint(constraint: AutoLayoutConstraint) {
+        console.log(constraint)
+        this.constraints = this.constraints.map(c => c.id == constraint.id ? constraint : c)
     }
 
     codes(): string {
@@ -284,20 +291,18 @@ export class UIView implements IRawParams {
             codes += `(${toViewName}`
 
             if (constraint.toAttribute) {
-                codes += `.${constraint.toAttribute})`
+                codes += `.snp.${constraint.toAttribute})`
             } else {
                 codes += ")"
             }
 
             if (constraint.constant) {
                 codes += `.offset(${constraint.constant})`
+            } else if (constraint.multiplier) {
+                codes += `.multipliedBy(${constraint.multiplier})`
             }
         } else if (constraint.constant) {
             codes += `(${constraint.constant})`
-        }
-
-        if (constraint.multiplier) {
-            codes += `.multipliedBy(${constraint.multiplier})`
         }
 
         return codes
@@ -325,20 +330,18 @@ export class UIView implements IRawParams {
             codes += ` ${toViewName}`
 
             if (constraint.toAttribute) {
-                codes += `.${constraint.toAttribute})`
+                codes += `.${constraint.toAttribute}`
             } else {
-                codes += ""
+                codes += `.${constraint.attribute}`
             }
 
             if (constraint.constant) {
                 codes += ` + ${constraint.constant}`
+            } else if (constraint.multiplier) {
+                codes += ` * ${constraint.multiplier}`
             }
         } else if (constraint.constant) {
             codes += ` ${constraint.constant}`
-        }
-
-        if (constraint.multiplier) {
-            codes += ` * ${constraint.multiplier}`
         }
 
         return codes

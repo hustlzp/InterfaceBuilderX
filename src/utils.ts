@@ -1,4 +1,8 @@
 
+export interface IRawParams {
+    [key: string]: any
+}
+
 export function capitalize(s: string): string {
     if (typeof s !== 'string') return ''
 

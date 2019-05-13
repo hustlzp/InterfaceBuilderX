@@ -24,7 +24,11 @@
     <!-- <views-panel :node="node"></views-panel> -->
     <codes-panel :view="views.length > 0 ? views[0] : null"></codes-panel>
 
-    <properties-panel :view="selectedView" @update="didUpdateProperty"></properties-panel>
+    <properties-panel
+      :view="selectedView"
+      :siblingViews="selectedViewSiblingViews"
+      @update="didUpdateProperty"
+    ></properties-panel>
 
     <add-view-dialog :visible.sync="addViewDialogVisible" @create="didCreateView"></add-view-dialog>
   </div>
@@ -152,6 +156,30 @@ export default class Home extends Vue {
     }
 
     menu.popup({ window: remote.getCurrentWindow() });
+  }
+
+  get selectedViewSiblingViews(): UIView[] {
+    if (!this.selectedView) {
+      return [];
+    }
+
+    let superview = this.selectedView.superview;
+
+    if (!superview) {
+      return [];
+    }
+
+    var siblingViews: UIView[] = [superview];
+
+    superview.subviews.forEach(subview => {
+      if (subview == this.selectedView) {
+        return;
+      }
+
+      siblingViews.push(subview);
+    });
+
+    return siblingViews;
   }
 
   @Watch("selectedView")

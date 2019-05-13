@@ -1,9 +1,9 @@
 import { UIView } from '@/cocoa/UIView';
 import uuidv4 from 'uuid/v4';
+import { IRawParams } from '@/utils';
 
 export enum AutoLayoutAttribute {
-    width = "width",
-    height = "height",
+    edges = "edges",
     centerX = "centerX",
     centerY = "centerY",
     center = "center",
@@ -11,7 +11,8 @@ export enum AutoLayoutAttribute {
     top = "top",
     right = "right",
     bottom = "bottom",
-    edges = "edges"
+    width = "width",
+    height = "height",
 }
 
 export enum AutoLayoutRelation {
@@ -20,7 +21,9 @@ export enum AutoLayoutRelation {
     greaterThanOrEqual = 1
 }
 
-export class AutoLayoutConstraint {
+export class AutoLayoutConstraint implements IRawParams {
+    [key: string]: any
+
     id!: string
     view!: UIView
     attribute!: AutoLayoutAttribute
