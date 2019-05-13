@@ -10,19 +10,22 @@
           <el-form-item label="名称" for="name">
             <el-input v-model="form.name" @input="onNameInput" id="name"></el-input>
           </el-form-item>
-          <el-form-item for="is-component" v-if="view && !view.isComponentInstance">
+          <el-form-item for="is-component" v-if="view && !view.isComponentInstance && !view.isRoot">
             <el-checkbox v-model="form.isComponent" @input="onIsComponentInput" id="is-component">组件</el-checkbox>
           </el-form-item>
           <el-form-item
             label="组件名"
             for="component-name"
-            v-if="view && view.isComponent && view.superview"
+            v-if="view && view.isComponent && !view.isRoot"
           >
             <el-input
               :value="form.componentName|capitalize"
               @input="onComponentNameInput"
               id="component-name"
             ></el-input>
+          </el-form-item>
+          <el-form-item for="as-function" v-if="view && view.isRoot">
+            <el-checkbox v-model="form.asFunction" @input="onAsFunctionInput" id="is-component">函数形式</el-checkbox>
           </el-form-item>
         </el-form>
       </el-collapse-item>
@@ -90,6 +93,7 @@ interface Form {
   className: string | null;
   isComponent: boolean;
   componentName: string | null;
+  asFunction: boolean;
 }
 
 @Component({
@@ -108,7 +112,8 @@ export default class PropertiesPanel extends Vue {
     name: null,
     className: null,
     isComponent: false,
-    componentName: null
+    componentName: null,
+    asFunction: false
   };
 
   created() {
@@ -180,7 +185,7 @@ export default class PropertiesPanel extends Vue {
     this.$emit("update", { key: "name", value: val });
   }
 
-  onIsComponentInput(val: string) {
+  onIsComponentInput(val: boolean) {
     this.$emit("update", { key: "isComponent", value: val });
 
     if (this.view) {
@@ -190,6 +195,10 @@ export default class PropertiesPanel extends Vue {
         value: this.form.componentName
       });
     }
+  }
+
+  onAsFunctionInput(val: boolean) {
+    this.$emit("update", { key: "asFunction", value: val });
   }
 
   onComponentNameInput(val: string) {
