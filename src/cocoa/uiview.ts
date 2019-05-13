@@ -239,7 +239,7 @@ export class UIView implements IRawParams {
     }
 
     // 自身 View 代码
-    private selfViewCodes(): string {
+    selfViewCodes(): string {
         let codes = `let ${this.name} = UIView()`
 
         if (this.backgroundColor) {
