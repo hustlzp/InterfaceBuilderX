@@ -43,7 +43,7 @@
       </el-collapse-item>
 
       <!-- 约束 -->
-      <el-collapse-item title="约束" name="constraints">
+      <el-collapse-item title="约束" name="constraints" v-if="view">
         <div class="constraints-wap" v-if="view && view.constraints.length > 0">
           <div class="constraint" v-for="constraint in view.constraints" :key="constraint.id">
             {{view.constraintCodesForDisplay(constraint)}}
