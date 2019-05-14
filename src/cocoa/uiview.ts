@@ -109,6 +109,7 @@ export class UIView implements IRawParams {
     isComponent: boolean = false
     // 组件名称
     componentName: string | null = null
+    // 组件实例列表
     componentInstances: UIView[] = []
 
     // 是否为组件实例
@@ -155,6 +156,11 @@ export class UIView implements IRawParams {
     updateConstraint(constraint: AutoLayoutConstraint) {
         console.log(constraint)
         this.constraints = this.constraints.map(c => c.id == constraint.id ? constraint : c)
+    }
+
+    addSubview(subview: UIView): void {
+        this.subviews.push(subview)
+        subview.superview = this
     }
 
     allSubviews(): UIView[] {

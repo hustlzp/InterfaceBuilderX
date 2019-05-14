@@ -121,9 +121,9 @@ export default class Home extends Vue {
 
   didCreateView(view: UIView) {
     if (this.selectedView) {
-      this.selectedView.subviews.push(view);
+      this.selectedView.addSubview(view);
     } else if (this.views.length > 0) {
-      this.views[0].subviews.push(view);
+      this.views[0].addSubview(view);
     } else {
       this.views.push(view);
     }
@@ -133,9 +133,9 @@ export default class Home extends Vue {
 
   didCreateComponentInstance(view: UIView) {
     if (this.selectedView) {
-      this.selectedView.subviews.push(view);
+      this.selectedView.addSubview(view);
     } else if (this.views.length > 0) {
-      this.views[0].subviews.push(view);
+      this.views[0].addSubview(view);
     } else {
       this.views.push(view);
     }

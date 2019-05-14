@@ -43,7 +43,7 @@ export class UIButton extends UIView {
         if (this.backgroundColor) {
             codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
         }
-        
+
         // Action
         let action = this.action ? `#selector(${this.action})` : "nil"
         codes += `\n${this.name}.addTarget(self, action: ${action}, for: .touchUpInside)`
