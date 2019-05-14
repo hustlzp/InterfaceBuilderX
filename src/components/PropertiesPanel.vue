@@ -220,6 +220,8 @@ export default class PropertiesPanel extends Vue {
 .properties-panel {
   //   padding: 10px 10px;
   //   border-top: none;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .class-name {

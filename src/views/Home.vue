@@ -318,9 +318,8 @@ export default class Home extends Vue {
 }
 
 .custom-tree-node {
-  // flex: 1;
-  // display: flex;
-  // justify-content: space-between;
+  display: flex;
+  align-items: center;
 }
 
 .component-flag,
@@ -329,8 +328,11 @@ export default class Home extends Vue {
   background-color: #f4f4f5;
   border: 1px solid #e6e6e6;
   border-radius: 4px;
-  padding: 2px 5px;
+  padding: 0 5px;
+  height: 18px;
+  display: block;
   font-weight: bold;
+  line-height: 18px;
   margin-left: 6px;
   font-family: "SFMono-Regular", "monospace";
 }
