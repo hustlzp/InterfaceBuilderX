@@ -33,16 +33,17 @@ export class UIButton extends UIView {
     selfViewCodes(): string {
         var codes = `let ${this.name} = UIButton()`
 
+        let publicAttributesCodes = this.publicSelfViewAttributesCodes()
+        if (publicAttributesCodes) {
+            codes += publicAttributesCodes
+        }
+
         // 标题
         codes += `\n${this.name}.setTitle("${this.title || ""}".localized(), for: .normal)`
 
         // 颜色
         let colorCodes = (this.titleColor || UIColor.black).codes
         codes += `\n${this.name}.setTitleColor(${colorCodes}, for: .normal)`
-
-        if (this.backgroundColor) {
-            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
-        }
 
         // Action
         let action = this.action ? `#selector(${this.action})` : "nil"

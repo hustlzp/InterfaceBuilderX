@@ -55,7 +55,8 @@ import {
   UIViewAttribute,
   UIImageView,
   UITableView,
-  UITextField
+  UITextField,
+  UIStackView
 } from "@/cocoa";
 import uuidv4 from "uuid/v4";
 import { Component, Vue, Watch } from "vue-property-decorator";
@@ -79,7 +80,7 @@ export default class Home extends Vue {
   selectedView: UIView | null = null;
 
   views: UIView[] = [
-    new UIView([
+    new UIStackView([
       new UILabel(),
       new UIButton([new UIImageView()]),
       new UITableView(),

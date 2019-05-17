@@ -2,6 +2,7 @@ import "reflect-metadata";
 import uuidv4 from 'uuid/v4';
 import { capitalize, indent, IRawParams } from '@/utils';
 import { AutoLayoutConstraint, AutoLayoutRelation } from '@/cocoa/AutoLayout'
+import { UIStackView } from './UIStackView';
 
 export class UIColor {
     r!: number
@@ -128,6 +129,9 @@ export class UIView implements IRawParams {
     @attribute(UIColor, "背景色")
     backgroundColor: UIColor | null = null
 
+    @attribute(Number, "Corner Radius")
+    cornerRadius: number = 0
+
     get isRoot(): boolean {
         return this.superview == null
     }
@@ -203,7 +207,7 @@ export class UIView implements IRawParams {
     }
 
     // View 代码
-    private viewCodes(superview: UIView | null): string {
+    viewCodes(superview: UIView | null): string {
         let codes =
             this.asFunction ?
                 `let ${this.name} = create${capitalize(this.name!)}()` :
@@ -213,7 +217,7 @@ export class UIView implements IRawParams {
                         `let ${this.name} = create${capitalize(this.component!.componentName!)}()` :
                         this.selfViewCodes()
 
-        if (superview) {
+        if (superview && superview.className != "UIStackView") {
             codes += `\n${superview.name}.addSubview(${this.name})`
         }
 
@@ -250,6 +254,21 @@ export class UIView implements IRawParams {
 
         if (this.backgroundColor) {
             codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
+        return codes
+    }
+
+    publicSelfViewAttributesCodes(): string {
+        var codes = ""
+
+        if (this.backgroundColor) {
+            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        }
+
+        if (this.cornerRadius > 0) {
+            codes += `\n${this.name}.layer.cornerRadius = ${this.cornerRadius}`
+            codes += `\n${this.name}.layer.maskToBounds = true`
         }
 
         return codes
@@ -303,7 +322,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    private subviewsViewCodes(): string {
+    subviewsViewCodes(): string {
         let codes = ""
 
         for (const subview of this.subviews) {
@@ -403,7 +422,11 @@ export class UIView implements IRawParams {
             }
 
             if (constraint.constant) {
-                codes += ` + ${constraint.constant}`
+                if (constraint.constant >= 0) {
+                    codes += ` + ${constraint.constant}`
+                } else {
+                    codes += ` - ${Math.abs(constraint.constant)}`
+                }
             } else if (constraint.multiplier) {
                 codes += ` * ${constraint.multiplier}`
             }

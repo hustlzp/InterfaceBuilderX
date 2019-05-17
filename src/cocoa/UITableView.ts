@@ -23,8 +23,9 @@ export class UITableView extends UIView {
     selfViewCodes(): string {
         let codes = `let ${this.name} = UITableView()`
 
-        if (this.backgroundColor) {
-            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        let publicAttributesCodes = this.publicSelfViewAttributesCodes()
+        if (publicAttributesCodes) {
+            codes += publicAttributesCodes
         }
 
         codes += `\n${this.name}.delegate = self

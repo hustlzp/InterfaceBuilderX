@@ -18,7 +18,13 @@
         </el-select>
       </el-form-item>
       <el-form-item label="名称">
-        <el-input autofocus ref="inputName" v-model="form.name" placeholder="名称"></el-input>
+        <el-input
+          autofocus
+          ref="inputName"
+          @keyup.enter.native="onSubmit"
+          v-model="form.name"
+          placeholder="名称"
+        ></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
@@ -36,7 +42,8 @@ import {
   UIButton,
   UIImageView,
   UITableView,
-  UITextField
+  UITextField,
+  UIStackView
 } from "@/cocoa";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { ElInput } from "element-ui/types/input";
@@ -61,6 +68,7 @@ export default class AddViewDialog extends Vue {
     UIButton,
     UIImageView,
     UITableView,
+    UIStackView,
     UITextField
   ];
 

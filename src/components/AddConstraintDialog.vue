@@ -80,6 +80,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
+        <el-button type="primary" @click="onSubmitAndContinue">提交并继续</el-button>
         <el-button type="default" @click="dialogVisible = false">取消</el-button>
       </el-form-item>
     </el-form>
@@ -178,6 +179,32 @@ export default class AddConstraintDialog extends Vue {
     }
 
     this.dialogVisible = false;
+  }
+
+  onSubmitAndContinue() {
+    if (!this.form.attribute) {
+      this.$message.error("attribute 不能为空");
+      return;
+    }
+
+    let constraint = new AutoLayoutConstraint(
+      this.view,
+      this.form.attribute,
+      this.form.relation,
+      this.form.toView,
+      this.form.toAttribute,
+      this.form.multiplier,
+      this.form.constant
+    );
+
+    if (this.constraint) {
+      constraint.id = this.constraint.id;
+      this.$emit("update", constraint);
+    } else {
+      this.$emit("create", constraint);
+    }
+
+    this.resetData();
   }
 
   initData() {
