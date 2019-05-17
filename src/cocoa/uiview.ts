@@ -252,8 +252,9 @@ export class UIView implements IRawParams {
     selfViewCodes(): string {
         let codes = `let ${this.name} = UIView()`
 
-        if (this.backgroundColor) {
-            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+        let publicAttributesCodes = this.publicSelfViewAttributesCodes()
+        if (publicAttributesCodes) {
+            codes += publicAttributesCodes
         }
 
         return codes
