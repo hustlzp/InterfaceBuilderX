@@ -5,6 +5,7 @@
     :visible.sync="dialogVisible"
     @open="initData"
     @opened="opened"
+    width="720px"
     @closed="resetData"
     class="dialog"
   >
@@ -57,6 +58,8 @@
           </el-option>
           <el-option v-if="view" label="self" :value="view"></el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item label="">
         <el-select
           v-model="form.toAttribute"
           class="select-to-attribute"
@@ -80,8 +83,8 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
-        <el-button type="primary" @click="onSubmitAndContinue">提交并继续</el-button>
-        <el-button type="default" @click="dialogVisible = false">取消</el-button>
+        <el-button type="default" @click="onSubmitAndContinue">提交并继续</el-button>
+        <!-- <el-button type="default" @click="dialogVisible = false">取消</el-button> -->
       </el-form-item>
     </el-form>
   </el-dialog>

@@ -10,6 +10,7 @@
         highlight-current
         :props="defaultProps"
         @node-click="handleNodeClick"
+        @node-drop="didNodeDrop"
         default-expand-all
         :expand-on-click-node="false"
         :empty-text="null"
@@ -36,11 +37,19 @@
     ></properties-panel>
 
     <add-view-dialog :visible.sync="addViewDialogVisible" @create="didCreateView"></add-view-dialog>
+
     <add-component-instance-dialog
       :visible.sync="addComponentInstanceDialogVisible"
       :components="components"
       @create="didCreateComponentInstance"
     ></add-component-instance-dialog>
+
+    <add-constraint-dialog
+      :visible.sync="addConstraintDialogVisible"
+      @create="didCreateConstraint"
+      :view="selectedView"
+      :siblingViews="selectedViewSiblingViews"
+    ></add-constraint-dialog>
   </div>
 </template>
 
@@ -56,16 +65,18 @@ import {
   UIImageView,
   UITableView,
   UITextField,
-  UIStackView
+  UIStackView,
+  AutoLayoutConstraint
 } from "@/cocoa";
 import uuidv4 from "uuid/v4";
+import { ElTree, TreeNode } from "element-ui/types/tree";
 import { Component, Vue, Watch } from "vue-property-decorator";
 import PropertiesPanel from "@/components/PropertiesPanel.vue";
 import ViewsPanel from "@/components/ViewsPanel.vue";
 import CodesPanel from "@/components/CodesPanel.vue";
 import AddViewDialog from "@/components/AddViewDialog.vue";
 import AddComponentInstanceDialog from "@/components/AddComponentInstanceDialog.vue";
-import { ElTree, TreeNode } from "element-ui/types/tree";
+import AddConstraintDialog from "@/components/AddConstraintDialog.vue";
 
 @Component({
   components: {
@@ -73,7 +84,8 @@ import { ElTree, TreeNode } from "element-ui/types/tree";
     ViewsPanel,
     CodesPanel,
     AddViewDialog,
-    AddComponentInstanceDialog
+    AddComponentInstanceDialog,
+    AddConstraintDialog
   }
 })
 export default class Home extends Vue {
@@ -98,9 +110,23 @@ export default class Home extends Vue {
 
   addViewDialogVisible = false;
   addComponentInstanceDialogVisible = false;
+  addConstraintDialogVisible = false;
 
   handleNodeClick(data: UIView, node: TreeNode<string, UIView>) {
     this.selectedView = data;
+  }
+
+  didNodeDrop(
+    node: TreeNode<string, UIView>,
+    relatedNode: TreeNode<string, UIView>,
+    position: any,
+    event: any
+  ) {
+    if (position == "inner") {
+      node.data.superview = relatedNode.data;
+    } else {
+      node.data.superview = relatedNode.data.superview;
+    }
   }
 
   didUpdateProperty(object: { key: string; value: any }) {
@@ -175,6 +201,14 @@ export default class Home extends Vue {
     this.selectedView = null;
   }
 
+  didCreateConstraint(constraint: AutoLayoutConstraint) {
+    if (!this.selectedView) {
+      return;
+    }
+
+    this.selectedView.addConstraint(constraint);
+  }
+
   showContextMenu(event: any, view: UIView) {
     const menu = new Menu();
     let that = this;
@@ -193,6 +227,15 @@ export default class Home extends Vue {
         })
       );
     }
+
+    menu.append(
+      new MenuItem({
+        label: "Add Constraint",
+        click() {
+          that.addConstraintDialogVisible = true;
+        }
+      })
+    );
 
     if (
       !this.selectedView ||
