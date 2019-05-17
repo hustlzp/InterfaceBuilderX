@@ -260,6 +260,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
+    // 公共属性代码
     publicSelfViewAttributesCodes(): string {
         var codes = ""
 
