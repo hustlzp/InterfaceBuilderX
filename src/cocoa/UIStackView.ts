@@ -2,8 +2,8 @@ import { UIColor, UIView, UIFont, attribute, enumAttribute } from './UIView';
 import { capitalize } from '@/utils';
 
 enum LayoutAxis {
-    vertical = "vertical",
-    horizontal = "horizontal"
+    vertical,
+    horizontal
 }
 
 export class UIStackView extends UIView {
@@ -24,7 +24,7 @@ export class UIStackView extends UIView {
             codes += publicAttributesCodes
         }
 
-        codes += `\n${this.name}.axis = .${this.axis}`
+        codes += `\n${this.name}.axis = .${this.getEnumKeyForValue(LayoutAxis, this.axis)}`
         codes += `\n${this.name}.spacing = ${this.spacing}`
 
         return codes
@@ -53,4 +53,5 @@ export class UIStackView extends UIView {
 
         return codes
     }
+
 }

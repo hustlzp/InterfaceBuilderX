@@ -461,4 +461,10 @@ export class UIView implements IRawParams {
 
         return codes
     }
+
+    getEnumKeyForValue(enum_: any, value: any): string {
+        let enumKeys = Object.keys(enum_).filter(key => isNaN(parseInt(key, 10)))
+
+        return enumKeys.filter(key => enum_[key] == value)[0]
+    }
 }
