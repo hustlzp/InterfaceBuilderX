@@ -1,5 +1,10 @@
-import { UIColor, UIView, UIFont, attribute } from './UIView';
+import { UIColor, UIView, UIFont, attribute, enumAttribute } from './UIView';
 import { capitalize } from '@/utils';
+
+enum LayoutAxis {
+    vertical = "vertical",
+    horizontal = "horizontal"
+}
 
 export class UIStackView extends UIView {
     name: string = "stackView"
@@ -7,6 +12,9 @@ export class UIStackView extends UIView {
 
     @attribute(Number, "Spacing")
     spacing: number = 0
+
+    @enumAttribute(LayoutAxis, "Axis")
+    axis: LayoutAxis = LayoutAxis.vertical
 
     selfViewCodes(): string {
         let codes = `let ${this.name} = UIStackView(arrangedSubviews: [${this.subviews.map(subview => subview.name).join(', ')}])`
@@ -16,7 +24,7 @@ export class UIStackView extends UIView {
             codes += publicAttributesCodes
         }
 
-        codes += `\n${this.name}.axis = .vertical`
+        codes += `\n${this.name}.axis = .${this.axis}`
         codes += `\n${this.name}.spacing = ${this.spacing}`
 
         return codes

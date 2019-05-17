@@ -81,14 +81,32 @@ export interface UIViewAttribute {
     key: string
     value: any
     label: string
-    type: any
+    type: any,
+    enums?: { key: string, value: any }[] | null
+}
+
+class Enum {
 }
 
 export function attribute(type: any, label: string) {
     return (target: Object, propertyKey: string | symbol): void => {
         Reflect.defineMetadata('isAttribute', true, target, propertyKey)
         Reflect.defineMetadata('label', label, target, propertyKey)
-        Reflect.defineMetadata('design:type', type, target, propertyKey)
+        Reflect.defineMetadata('type', type, target, propertyKey)
+    }
+}
+
+export function enumAttribute(type: any, label: string) {
+    let enumKeys = Object.keys(type).filter(key => isNaN(parseInt(key, 10)))
+    let enums = enumKeys.map(key => {
+        return { key: key, value: type[key] }
+    })
+
+    return (target: Object, propertyKey: string | symbol): void => {
+        Reflect.defineMetadata('isAttribute', true, target, propertyKey)
+        Reflect.defineMetadata('label', label, target, propertyKey)
+        Reflect.defineMetadata('type', Enum, target, propertyKey)
+        Reflect.defineMetadata('enums', enums, target, propertyKey)
     }
 }
 
@@ -144,7 +162,8 @@ export class UIView implements IRawParams {
                 key: k,
                 value: this[k],
                 label: Reflect.getMetadata("label", this, k),
-                type: Reflect.getMetadata("design:type", this, k)
+                type: Reflect.getMetadata("type", this, k),
+                enums: Reflect.getMetadata("enums", this, k)
             }
         })
     }
@@ -355,6 +374,10 @@ export class UIView implements IRawParams {
         }
 
         return codes
+    }
+
+    get isLackOfConstraints(): boolean {
+        return this.superview != null && this.superview.className != "UIStackView" && this.constraints.length == 0
     }
 
     private constraintCodes(constraint: AutoLayoutConstraint): string {

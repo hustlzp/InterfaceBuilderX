@@ -18,6 +18,9 @@
       >
         <span class="custom-tree-node" slot-scope="{ node, data }">
           <span class="node-label">{{ node.label }}</span>
+          <span class="warning el-icon-warning" v-if="data.isLackOfConstraints">
+            <!-- <i class="el-icon-warning"></i> -->
+          </span>
           <span v-if="data.isComponent" class="component-flag">{{data.componentName}}</span>
           <span
             v-if="data.isComponentInstance"
@@ -364,6 +367,17 @@ export default class Home extends Vue {
 .custom-tree-node {
   display: flex;
   align-items: center;
+}
+
+.warning {
+  display: inline-block;
+  color: #ffc501;
+  font-size: 14px;
+  // background-color: #ffc501;
+  // width: 6px;
+  // height: 6px;
+  // border-radius: 3px;
+  margin-left: 6px;
 }
 
 .component-flag,

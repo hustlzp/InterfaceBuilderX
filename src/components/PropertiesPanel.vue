@@ -59,6 +59,8 @@
           </div>
         </div>
 
+        <div class="el-icon-warning constraint-warning" v-if="view && view.constraints.length == 0"></div>
+
         <el-button
           type="primary"
           class="btn-add-constraint"
@@ -276,6 +278,12 @@ export default class PropertiesPanel extends Vue {
         }
       }
     }
+  }
+
+  .constraint-warning {
+    color: #ffc501;
+    font-size: 20px;
+    margin-bottom: 15px;
   }
 
   .btn-add-constraint {
