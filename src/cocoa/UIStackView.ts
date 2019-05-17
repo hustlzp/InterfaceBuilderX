@@ -1,5 +1,5 @@
 import { UIColor, UIView, UIFont, attribute, enumAttribute } from './UIView';
-import { capitalize } from '@/utils';
+import { capitalize, indent } from '@/utils';
 
 enum LayoutAxis {
     vertical,
@@ -49,6 +49,36 @@ export class UIStackView extends UIView {
 
         if (superview) {
             codes += `\n${superview.name}.addSubview(${this.name})`
+        }
+
+        return codes
+    }
+
+    selfComponentCodes(): string {
+        var codes = ""
+
+        if (this.isComponent || this.asFunction) {
+            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+            codes += `private func create${componentName}() -> ${this.className} {`
+
+            codes += indent(this.subviewsViewCodes().substr(1))
+
+            codes += "\n\n"
+            codes += indent(this.selfViewCodes())
+
+            if (this.subviews.length > 0) {
+                codes += "\n\n    // 约束"
+
+                if (this.asFunction) {
+                    codes += "\n\n"
+                    codes += indent(this.selfLayoutCodes())
+                }
+
+                codes += indent(this.subviewsLayoutCodes())
+            }
+
+            codes += indent(`\n\nreturn ${this.name}`)
+            codes += "\n}"
         }
 
         return codes

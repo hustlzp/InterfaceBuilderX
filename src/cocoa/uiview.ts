@@ -295,7 +295,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    private selfLayoutCodes(): string {
+    selfLayoutCodes(): string {
         let codes = ""
 
         // 自身约束代码
@@ -312,7 +312,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    private selfComponentCodes(): string {
+    selfComponentCodes(): string {
         var codes = ""
 
         if (this.isComponent || this.asFunction) {
@@ -354,7 +354,7 @@ export class UIView implements IRawParams {
         return codes
     }
 
-    private subviewsLayoutCodes(): string {
+    subviewsLayoutCodes(): string {
         var codes = ""
 
         for (const subview of this.subviews) {
