@@ -184,6 +184,11 @@ export default class PropertiesPanel extends Vue {
     this.form.componentName = val ? val.componentName : null;
   }
 
+  @Watch("view.name")
+  onViewNameChanged(newName: string | null) {
+    this.form.name = newName;
+  }
+
   onNameInput(val: string) {
     this.$emit("update", { key: "name", value: val });
   }

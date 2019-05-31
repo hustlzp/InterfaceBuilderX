@@ -39,7 +39,12 @@
       @update="didUpdateProperty"
     ></properties-panel>
 
-    <add-view-dialog :visible.sync="addViewDialogVisible" @create="didCreateView"></add-view-dialog>
+    <add-view-dialog
+      :visible.sync="addViewDialogVisible"
+      :view="viewForUpdating"
+      @create="didCreateView"
+      @update="didUpdateView"
+    ></add-view-dialog>
 
     <add-component-instance-dialog
       :visible.sync="addComponentInstanceDialogVisible"
@@ -53,6 +58,12 @@
       :view="selectedView"
       :siblingViews="selectedViewSiblingViews"
     ></add-constraint-dialog>
+
+    <!-- <update-view-class-dialog
+      :visible.sync="updateViewClassDialogVisible"
+      @update="didUpdateViewClass"
+      :view="selectedView"
+    ></update-view-class-dialog>-->
   </div>
 </template>
 
@@ -80,6 +91,7 @@ import CodesPanel from "@/components/CodesPanel.vue";
 import AddViewDialog from "@/components/AddViewDialog.vue";
 import AddComponentInstanceDialog from "@/components/AddComponentInstanceDialog.vue";
 import AddConstraintDialog from "@/components/AddConstraintDialog.vue";
+import UpdateViewClassDialog from "@/components/UpdateViewClassDialog.vue";
 
 @Component({
   components: {
@@ -88,21 +100,23 @@ import AddConstraintDialog from "@/components/AddConstraintDialog.vue";
     CodesPanel,
     AddViewDialog,
     AddComponentInstanceDialog,
-    AddConstraintDialog
+    AddConstraintDialog,
+    UpdateViewClassDialog
   }
 })
 export default class Home extends Vue {
   selectedView: UIView | null = null;
+  viewForUpdating: UIView | null = null;
 
-  views: UIView[] = [
-    new UIStackView([
-      new UILabel(),
-      new UIButton([new UIImageView()]),
-      new UITableView(),
-      new UITextField()
-    ])
-  ];
-  // views: UIView[] = [];
+  // views: UIView[] = [
+  //   new UIStackView([
+  //     new UILabel(),
+  //     new UIButton([new UIImageView()]),
+  //     new UITableView(),
+  //     new UITextField()
+  //   ])
+  // ];
+  views: UIView[] = [];
 
   defaultProps = {
     label: (data: UIView, node: any): string => {
@@ -114,6 +128,7 @@ export default class Home extends Vue {
   addViewDialogVisible = false;
   addComponentInstanceDialogVisible = false;
   addConstraintDialogVisible = false;
+  updateViewClassDialogVisible = false;
 
   handleNodeClick(data: UIView, node: TreeNode<string, UIView>) {
     this.selectedView = data;
@@ -204,6 +219,72 @@ export default class Home extends Vue {
     this.selectedView = null;
   }
 
+  didUpdateView(payload: {
+    view: UIView;
+    name: string;
+    viewClass: { new (): UIView };
+  }) {
+    let { view, name, viewClass } = payload;
+
+    if (!viewClass) {
+      view["name"] = name;
+      return;
+    }
+
+    let newView = new viewClass();
+
+    // attributes
+    Object.keys(view).forEach(key => {
+      if (Object.keys(newView).includes(key) && key != "className") {
+        newView[key] = view[key];
+      }
+    });
+    console.log(name);
+
+    // subviews
+    if (view.superview) {
+      view.superview.subviews = view.superview.subviews.map(subview =>
+        subview === view ? newView : subview
+      );
+    } else {
+      this.views = [newView];
+    }
+
+    // superview
+    view.subviews.forEach(subview => {
+      subview.superview = newView;
+    });
+
+    // component instances
+    if (view.component) {
+      view.component.componentInstances = view.component.componentInstances.map(
+        instance => (instance == view ? newView : instance)
+      );
+    }
+
+    // component
+    view.componentInstances.forEach(instance => {
+      instance.component = newView;
+    });
+
+    // constraints
+    if (this.views[0]) {
+      this.views[0].constraintIterator(constraint => {
+        if (constraint.view === view) {
+          constraint.view = newView;
+        }
+        if (constraint.toView === view) {
+          constraint.toView = newView;
+        }
+      });
+    }
+
+    this.selectedView = newView;
+  }
+
+  // 更新 view 的类
+  // didUpdateViewClass(view: UIView, viewClass: { new (): UIView }) {}
+
   didCreateConstraint(constraint: AutoLayoutConstraint) {
     if (!this.selectedView) {
       return;
@@ -225,20 +306,23 @@ export default class Home extends Vue {
         new MenuItem({
           label: "Add Subview",
           click() {
+            that.viewForUpdating = null;
             that.addViewDialogVisible = true;
           }
         })
       );
     }
 
-    menu.append(
-      new MenuItem({
-        label: "Add Constraint",
-        click() {
-          that.addConstraintDialogVisible = true;
-        }
-      })
-    );
+    if (this.views.length > 0) {
+      menu.append(
+        new MenuItem({
+          label: "Add Constraint",
+          click() {
+            that.addConstraintDialogVisible = true;
+          }
+        })
+      );
+    }
 
     if (
       !this.selectedView ||
@@ -249,6 +333,19 @@ export default class Home extends Vue {
           label: "Add Component Instance",
           click() {
             that.addComponentInstanceDialogVisible = true;
+          }
+        })
+      );
+    }
+
+    if (view) {
+      menu.append(
+        new MenuItem({
+          label: "Edit",
+          click() {
+            that.viewForUpdating = view;
+            that.addViewDialogVisible = true;
+            // that.updateViewClassDialogVisible = true;
           }
         })
       );

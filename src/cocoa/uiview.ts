@@ -2,7 +2,6 @@ import "reflect-metadata";
 import uuidv4 from 'uuid/v4';
 import { capitalize, indent, IRawParams } from '@/utils';
 import { AutoLayoutConstraint, AutoLayoutRelation } from '@/cocoa/AutoLayout'
-import { UIStackView } from './UIStackView';
 
 export class UIColor {
     r!: number
@@ -206,6 +205,14 @@ export class UIView implements IRawParams {
         }
     }
 
+    constraintIterator(callback: (constraint: AutoLayoutConstraint) => void): void {
+        this.constraints.forEach(constraint => callback(constraint))
+
+        for (const subview of this.subviews) {
+            subview.constraintIterator(callback)
+        }
+    }
+
     codes(): string {
         var codes = this.asFunction ? "" : this.viewCodes(null)
 
@@ -289,7 +296,7 @@ export class UIView implements IRawParams {
 
         if (this.cornerRadius > 0) {
             codes += `\n${this.name}.layer.cornerRadius = ${this.cornerRadius}`
-            codes += `\n${this.name}.layer.maskToBounds = true`
+            codes += `\n${this.name}.layer.masksToBounds = true`
         }
 
         return codes

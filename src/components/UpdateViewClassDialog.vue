@@ -1,13 +1,14 @@
 <template>
   <el-dialog
-    :title="view ? 'Edit View' : 'Add Subview'"
+    title="更新 View 类型"
+    append-to-body
     :visible.sync="dialogVisible"
     @open="initData"
     @opened="opened"
     @closed="resetData"
     class="dialog"
   >
-    <el-form :model="form" label-width="80px" label-position="left">
+    <el-form :model="form" label-width="95px" label-position="right">
       <el-form-item label="类">
         <el-select v-model="form.viewClass" placeholder="请选择类" filterable>
           <el-option
@@ -18,15 +19,6 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="名称">
-        <el-input
-          autofocus
-          ref="inputName"
-          @keyup.enter.native="onSubmit"
-          v-model="form.name"
-          placeholder="名称"
-        ></el-input>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
         <el-button type="default" @click="dialogVisible = false">取消</el-button>
@@ -36,36 +28,25 @@
 </template>
 
 <script lang="ts">
-import uuidv4 from "uuid/v4";
-import {
-  UIView,
-  UILabel,
-  UIButton,
-  UIImageView,
-  UITableView,
-  UITextField,
-  UIStackView
-} from "@/cocoa";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { ElInput } from "element-ui/types/input";
-import { ViewClasses } from "@/cocoa";
+import { ElSelect } from "element-ui/types/select";
+import { UIView, ViewClasses } from "../cocoa";
+import { IRawParams } from "../utils";
 
-interface Form {
-  viewClass: { new (): UIView };
-  name: string | null;
+interface Form extends IRawParams {
+  viewClass: { new (): UIView } | null;
 }
 
 @Component
-export default class AddViewDialog extends Vue {
+export default class UpdateViewClassDialog extends Vue {
   @Prop(Boolean) visible!: boolean;
-  @Prop(UIView) view!: UIView | null;
+  @Prop(UIView) view!: UIView;
 
+  viewClasses = ViewClasses;
   dialogVisible = false;
   form: Form = {
-    viewClass: UIView,
-    name: null
+    viewClass: null
   };
-  viewClasses = ViewClasses;
 
   created() {
     this.dialogVisible = this.visible;
@@ -77,47 +58,29 @@ export default class AddViewDialog extends Vue {
       return;
     }
 
-    if (!this.form.name) {
-      this.$message.error("名称不能为空");
+    if (this.form.viewClass === this.view.constructor) {
+      this.dialogVisible = false;
       return;
     }
 
-    if (this.view) {
-      let payload: any = {
-        view: this.view,
-        name: this.form.name
-      };
-
-      if (this.form.viewClass !== this.view.constructor) {
-        this.$emit("updateClass");
-        payload["viewClass"] = this.form.viewClass;
-      }
-
-      this.$emit("update", payload);
-    } else {
-      let view = new this.form.viewClass();
-      view.name = this.form.name;
-
-      this.$emit("create", view);
-    }
-
+    this.$emit("update", this.view, this.form.viewClass);
     this.dialogVisible = false;
   }
 
   initData() {
     if (this.view) {
       this.form.viewClass = this.view.constructor as { new (): UIView };
-      this.form.name = this.view.name;
     }
   }
 
   opened() {
-    (this.$refs.inputName as ElInput).focus();
+    // (this.$refs.inputName as ElSelect).focus();
   }
 
   resetData() {
-    this.form.viewClass = UIView;
-    this.form.name = null;
+    Object.keys(this.form).forEach(key => {
+      this.form[key] = null;
+    });
   }
 
   @Watch("dialogVisible")

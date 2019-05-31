@@ -6,6 +6,14 @@ enum LayoutAxis {
     horizontal
 }
 
+enum UIStackViewDistribution {
+    fill,
+    fillEqually,
+    fillProportionally,
+    equalSpacing,
+    equalCentering
+}
+
 export class UIStackView extends UIView {
     name: string = "stackView"
     className: string = "UIStackView"
@@ -16,6 +24,9 @@ export class UIStackView extends UIView {
     @enumAttribute(LayoutAxis, "Axis")
     axis: LayoutAxis = LayoutAxis.vertical
 
+    @enumAttribute(UIStackViewDistribution, "Distribution")
+    distribution: UIStackViewDistribution = UIStackViewDistribution.fill
+
     selfViewCodes(): string {
         let codes = `let ${this.name} = UIStackView(arrangedSubviews: [${this.subviews.map(subview => subview.name).join(', ')}])`
 
@@ -25,7 +36,12 @@ export class UIStackView extends UIView {
         }
 
         codes += `\n${this.name}.axis = .${this.getEnumKeyForValue(LayoutAxis, this.axis)}`
-        codes += `\n${this.name}.spacing = ${this.spacing}`
+        if (this.distribution != UIStackViewDistribution.fill) {
+            codes += `\n${this.name}.distribution = .${this.getEnumKeyForValue(UIStackViewDistribution, this.distribution)}`
+        }
+        if (typeof this.spacing == "number") {
+            codes += `\n${this.name}.spacing = ${this.spacing}`
+        }
 
         return codes
     }

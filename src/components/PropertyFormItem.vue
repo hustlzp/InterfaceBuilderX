@@ -5,7 +5,12 @@
     <color-property-form-item v-if="isColor" :attribute="attribute" v-model="value"></color-property-form-item>
     <font-property-form-item v-if="isFont" :attribute="attribute" v-model="value"></font-property-form-item>
     <el-select v-model="value" placeholder="请选择" v-if="isEnum">
-      <el-option v-for="enum_ in attribute.enums" :key="enum_.key" :label="enum_.key" :value="enum_.value"></el-option>
+      <el-option
+        v-for="enum_ in attribute.enums"
+        :key="enum_.key"
+        :label="enum_.key"
+        :value="enum_.value"
+      ></el-option>
     </el-select>
   </el-form-item>
 </template>
@@ -29,7 +34,7 @@ export default class PropertyFormItem extends Vue {
 
   created() {
     this.value = this.getFromAttribute();
-    console.log(this.attribute.type);
+    // console.log(this.attribute.type);
   }
 
   getFromAttribute(): any {
