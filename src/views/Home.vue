@@ -17,10 +17,18 @@
         @node-contextmenu="showContextMenu"
       >
         <span class="custom-tree-node" slot-scope="{ node, data }">
-          <span class="node-label">{{ node.label }}</span>
-          <span class="warning el-icon-warning" v-if="data.isLackOfConstraints">
-            <!-- <i class="el-icon-warning"></i> -->
-          </span>
+          <span v-show="!node.editing" class="node-label">{{ node.label }}</span>
+          <input
+            ref="inputName"
+            class="input-name"
+            :value="data.name"
+            @input="node.data.name = $event.target.value"
+            type="text"
+            v-if="node.editing"
+            autofocus
+            @blur="$set(node, 'editing', false)"
+          >
+          <span class="warning el-icon-warning" v-if="data.isLackOfConstraints"></span>
           <span v-if="data.isComponent" class="component-flag">{{data.componentName}}</span>
           <span
             v-if="data.isComponentInstance"
@@ -92,6 +100,7 @@ import AddViewDialog from "@/components/AddViewDialog.vue";
 import AddComponentInstanceDialog from "@/components/AddComponentInstanceDialog.vue";
 import AddConstraintDialog from "@/components/AddConstraintDialog.vue";
 import UpdateViewClassDialog from "@/components/UpdateViewClassDialog.vue";
+import { ElInput } from "element-ui/types/input";
 
 @Component({
   components: {
@@ -131,6 +140,19 @@ export default class Home extends Vue {
   updateViewClassDialogVisible = false;
 
   handleNodeClick(data: UIView, node: TreeNode<string, UIView>) {
+    if (data === this.selectedView) {
+      setTimeout(() => {
+        if (this.selectedView !== data) {
+          return;
+        }
+
+        this.$set(node, "editing", true);
+        this.$nextTick(() => {
+          (this.$refs.inputName as ElInput).focus();
+        });
+      }, 500);
+    }
+
     this.selectedView = data;
   }
 
@@ -293,6 +315,10 @@ export default class Home extends Vue {
     this.selectedView.addConstraint(constraint);
   }
 
+  // updateNodeName(event: any, node: TreeNode<string, UIView>) {
+  //   node.data.name = event.target.value;
+  // }
+
   showContextMenu(event: any, view: UIView) {
     const menu = new Menu();
     let that = this;
@@ -434,6 +460,14 @@ export default class Home extends Vue {
     right: 0;
     padding: 10px 0;
   }
+}
+
+.input-name {
+  font-size: 16px;
+  padding: 0 2px;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  border: 1px solid #409eff;
+  outline: none;
 }
 
 .views-panel {
