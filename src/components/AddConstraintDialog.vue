@@ -11,7 +11,27 @@
   >
     <el-form :model="form" label-width="95px" label-position="right">
       <el-form-item label="Attribute">
+        <!-- 添加时支持多选 -->
         <el-select
+          v-if="!constraint"
+          ref="selectAttribute"
+          class="select-attribute"
+          v-model="form.attributes"
+          placeholder="请选择"
+          filterable
+          multiple
+        >
+          <el-option
+            v-for="attribute in attributes"
+            :key="attribute"
+            :label="attribute"
+            :value="attribute"
+          ></el-option>
+        </el-select>
+
+        <!-- 编辑时不支持多选 -->
+        <el-select
+          v-if="constraint"
           ref="selectAttribute"
           class="select-attribute"
           v-model="form.attribute"
@@ -59,7 +79,7 @@
           <el-option v-if="view" label="self" :value="view"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="">
+      <el-form-item label>
         <el-select
           v-model="form.toAttribute"
           class="select-to-attribute"
@@ -110,6 +130,7 @@ import { IRawParams } from "../utils";
 
 interface Form extends IRawParams {
   attribute: AutoLayoutAttribute | null;
+  attributes: AutoLayoutAttribute[];
   relation: AutoLayoutRelation;
   toView: UIView | null;
   toAttribute: AutoLayoutAttribute | null;
@@ -127,6 +148,7 @@ export default class AddConstraintDialog extends Vue {
   dialogVisible = false;
   form: Form = {
     attribute: null,
+    attributes: [],
     relation: AutoLayoutRelation.equal,
     toView: null,
     toAttribute: null,
@@ -142,14 +164,14 @@ export default class AddConstraintDialog extends Vue {
     }
   ];
   attributes: AutoLayoutAttribute[] = [
-    AutoLayoutAttribute.edges,
-    AutoLayoutAttribute.center,
-    AutoLayoutAttribute.centerX,
-    AutoLayoutAttribute.centerY,
     AutoLayoutAttribute.left,
     AutoLayoutAttribute.top,
     AutoLayoutAttribute.right,
     AutoLayoutAttribute.bottom,
+    AutoLayoutAttribute.edges,
+    AutoLayoutAttribute.center,
+    AutoLayoutAttribute.centerX,
+    AutoLayoutAttribute.centerY,
     AutoLayoutAttribute.width,
     AutoLayoutAttribute.height
   ];
@@ -159,55 +181,63 @@ export default class AddConstraintDialog extends Vue {
   }
 
   async onSubmit() {
-    if (!this.form.attribute) {
-      this.$message.error("attribute 不能为空");
-      return;
-    }
-
-    let constraint = new AutoLayoutConstraint(
-      this.view,
-      this.form.attribute,
-      this.form.relation,
-      this.form.toView,
-      this.form.toAttribute,
-      this.form.multiplier,
-      this.form.constant
-    );
-
-    if (this.constraint) {
-      constraint.id = this.constraint.id;
-      this.$emit("update", constraint);
-    } else {
-      this.$emit("create", constraint);
-    }
-
-    this.dialogVisible = false;
+    this.submit(true);
   }
 
   onSubmitAndContinue() {
-    if (!this.form.attribute) {
-      this.$message.error("attribute 不能为空");
+    this.submit(false);
+    this.resetData();
+  }
+
+  submit(hide: boolean) {
+    if (this.constraint) {
+      if (!this.form.attribute) {
+        this.$message.error("Attribute 不能为空");
+        return;
+      }
+    } else {
+      if (this.form.attributes.length == 0) {
+        this.$message.error("Attribute 不能为空");
+        return;
+      }
+    }
+
+    if (!this.form.toView && !this.form.constant) {
+      this.$message.error("To View 与 Constant 不能都为空");
       return;
     }
 
-    let constraint = new AutoLayoutConstraint(
-      this.view,
-      this.form.attribute,
-      this.form.relation,
-      this.form.toView,
-      this.form.toAttribute,
-      this.form.multiplier,
-      this.form.constant
-    );
-
     if (this.constraint) {
+      let constraint = new AutoLayoutConstraint(
+        this.view,
+        this.form.attribute!,
+        this.form.relation,
+        this.form.toView,
+        this.form.toAttribute,
+        this.form.multiplier,
+        this.form.constant
+      );
       constraint.id = this.constraint.id;
       this.$emit("update", constraint);
     } else {
-      this.$emit("create", constraint);
+      this.form.attributes.forEach(attribute => {
+        let constraint = new AutoLayoutConstraint(
+          this.view,
+          attribute,
+          this.form.relation,
+          this.form.toView,
+          this.form.toAttribute,
+          this.form.multiplier,
+          this.form.constant
+        );
+
+        this.$emit("create", constraint);
+      });
     }
 
-    this.resetData();
+    if (hide) {
+      this.dialogVisible = false;
+    }
   }
 
   initData() {
@@ -224,6 +254,7 @@ export default class AddConstraintDialog extends Vue {
 
   resetData() {
     this.form.attribute = null;
+    this.form.attributes = [];
     this.form.relation = AutoLayoutRelation.equal;
     this.form.toView = null;
     this.form.toAttribute = null;
