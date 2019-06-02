@@ -22,21 +22,22 @@ export class UITextField extends UIView {
 
     selfViewCodes(): string {
         let codes = `let ${this.name} = UITextField()`
+        let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {
             codes += publicAttributesCodes
         }
 
-        codes += `\n${this.name}.placeholder = "${this.placeholder || ''}".localized()`
-        codes += `\n${this.name}.text = "${this.text || ''}".localized()`
+        codes += `\n${prefix}placeholder = "${this.placeholder || ''}".localized()`
+        codes += `\n${prefix}text = "${this.text || ''}".localized()`
 
         if (this.textColor) {
-            codes += `\n${this.name}.textColor = ${this.textColor.codes}`
+            codes += `\n${prefix}textColor = ${this.textColor.codes}`
         }
 
         // font
-        codes += `\n${this.name}.font = ${this.font.codes}`
+        codes += `\n${prefix}font = ${this.font.codes}`
 
         return codes
     }

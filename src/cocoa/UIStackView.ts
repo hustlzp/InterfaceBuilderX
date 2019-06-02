@@ -29,18 +29,19 @@ export class UIStackView extends UIView {
 
     selfViewCodes(): string {
         let codes = `let ${this.name} = UIStackView(arrangedSubviews: [${this.subviews.map(subview => subview.name).join(', ')}])`
+        let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {
             codes += publicAttributesCodes
         }
 
-        codes += `\n${this.name}.axis = .${this.getEnumKeyForValue(LayoutAxis, this.axis)}`
+        codes += `\n${prefix}axis = .${this.getEnumKeyForValue(LayoutAxis, this.axis)}`
         if (this.distribution != UIStackViewDistribution.fill) {
-            codes += `\n${this.name}.distribution = .${this.getEnumKeyForValue(UIStackViewDistribution, this.distribution)}`
+            codes += `\n${prefix}distribution = .${this.getEnumKeyForValue(UIStackViewDistribution, this.distribution)}`
         }
         if (typeof this.spacing == "number") {
-            codes += `\n${this.name}.spacing = ${this.spacing}`
+            codes += `\n${prefix}spacing = ${this.spacing}`
         }
 
         return codes
@@ -49,19 +50,22 @@ export class UIStackView extends UIView {
     viewCodes(superview: UIView | null): string {
         let codes = ""
 
-        if (!this.isComponent && !this.asFunction && !this.isComponentInstance) {
+        if (!this.isComponent && !this.isComponentInstance) {
             codes += this.subviewsViewCodes()
         }
 
         codes += "\n\n"
-        codes +=
-            this.asFunction ?
-                `let ${this.name} = create${capitalize(this.name!)}()` :
-                this.isComponent ?
-                    `let ${this.name} = create${capitalize(this.componentName!)}()` :
-                    this.isComponentInstance ?
-                        `let ${this.name} = create${capitalize(this.component!.componentName!)}()` :
-                        this.selfViewCodes()
+        if (this.isComponent || this.isComponentInstance) {
+            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+
+            if (this.isClassComponent) {
+                codes += `let ${this.name} = create${componentName}()`
+            } else {
+                codes += `let ${this.name} = ${componentName}()`
+            }
+        } else {
+            codes += this.selfViewCodes()
+        }
 
         if (superview) {
             codes += `\n${superview.name}.addSubview(${this.name})`
@@ -73,7 +77,7 @@ export class UIStackView extends UIView {
     selfComponentCodes(): string {
         var codes = ""
 
-        if (this.isComponent || this.asFunction) {
+        if (this.isComponent) {
             let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
             codes += `private func create${componentName}() -> ${this.className} {`
 
@@ -85,7 +89,7 @@ export class UIStackView extends UIView {
             if (this.subviews.length > 0) {
                 codes += "\n\n    // 约束"
 
-                if (this.asFunction) {
+                if (this.isComponent) {
                     codes += "\n\n"
                     codes += indent(this.selfLayoutCodes())
                 }

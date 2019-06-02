@@ -119,12 +119,10 @@ export class UIView implements IRawParams {
     superview: UIView | null = null
     constraints: AutoLayoutConstraint[] = []
 
-    // 是否使用函数形式
-    // 仅 rootView 适用
-    asFunction: boolean = false
-
     // 是否为组件
     isComponent: boolean = false
+    isFunctionComponent: boolean = false    // 函数组件
+    isClassComponent: boolean = false   // 类组件
     // 组件名称
     componentName: string | null = null
     // 组件实例列表
@@ -214,9 +212,9 @@ export class UIView implements IRawParams {
     }
 
     codes(): string {
-        var codes = this.asFunction ? "" : this.viewCodes(null)
+        var codes = this.isComponent ? "" : this.viewCodes(null)
 
-        if (this.subviews.length > 0 && !this.asFunction) {
+        if (this.subviews.length > 0 && !this.isComponent) {
             codes += "\n\n// 约束"
             codes += "\n\n"
             codes += this.layoutCodes(null)
@@ -234,20 +232,26 @@ export class UIView implements IRawParams {
 
     // View 代码
     viewCodes(superview: UIView | null): string {
-        let codes =
-            this.asFunction ?
-                `let ${this.name} = create${capitalize(this.name!)}()` :
-                this.isComponent ?
-                    `let ${this.name} = create${capitalize(this.componentName!)}()` :
-                    this.isComponentInstance ?
-                        `let ${this.name} = create${capitalize(this.component!.componentName!)}()` :
-                        this.selfViewCodes()
+        var codes = ""
 
-        if (superview && superview.className != "UIStackView") {
-            codes += `\n${superview.name}.addSubview(${this.name})`
+        if (this.isComponent || this.isComponentInstance) {
+            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+
+            if (this.isClassComponent) {
+                codes += `let ${this.name} =  ${componentName}()`
+            } else {
+                codes += `let ${this.name} = create${componentName}()`
+            }
+        } else {
+            codes += this.selfViewCodes()
         }
 
-        if (!this.isComponent && !this.asFunction && !this.isComponentInstance) {
+        if (superview && superview.className != "UIStackView") {
+            let prefix = superview.isClassComponent ? "" : `${superview.name}.`
+            codes += `\n${prefix}addSubview(${this.name})`
+        }
+
+        if (!this.isComponent && !this.isComponentInstance) {
             codes += this.subviewsViewCodes()
         }
 
@@ -258,7 +262,7 @@ export class UIView implements IRawParams {
     private layoutCodes(superview: UIView | null): string {
         var codes = this.selfLayoutCodes()
 
-        if (!this.isComponent && !this.asFunction && !this.isComponentInstance) {
+        if (!this.isComponent && !this.isComponentInstance) {
             codes += this.subviewsLayoutCodes()
         }
 
@@ -269,14 +273,16 @@ export class UIView implements IRawParams {
     private componentCodes(): string {
         let codes = this.selfComponentCodes()
 
-        codes += this.subviewsComponentCodes()
+        if (!this.isClassComponent) {
+            codes += this.subviewsComponentCodes()
+        }
 
         return codes
     }
 
     // 自身 View 代码
     selfViewCodes(): string {
-        let codes = `let ${this.name} = UIView()`
+        let codes = this.isClassComponent ? "" : `let ${this.name} = UIView()`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {
@@ -289,14 +295,15 @@ export class UIView implements IRawParams {
     // 公共属性代码
     publicSelfViewAttributesCodes(): string {
         var codes = ""
+        let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         if (this.backgroundColor) {
-            codes += `\n${this.name}.backgroundColor = ${this.backgroundColor.codes}`
+            codes += `\n${prefix}backgroundColor = ${this.backgroundColor.codes}`
         }
 
         if (this.cornerRadius > 0) {
-            codes += `\n${this.name}.layer.cornerRadius = ${this.cornerRadius}`
-            codes += `\n${this.name}.layer.masksToBounds = true`
+            codes += `\n${prefix}layer.cornerRadius = ${this.cornerRadius}`
+            codes += `\n${prefix}layer.masksToBounds = true`
         }
 
         return codes
@@ -304,10 +311,11 @@ export class UIView implements IRawParams {
 
     selfLayoutCodes(): string {
         let codes = ""
+        let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         // 自身约束代码
         if (this.constraints.length > 0) {
-            codes += `${this.name}.snp.makeConstraints { (make) in`
+            codes += `${prefix}snp.makeConstraints { (make) in`
 
             for (const constraint of this.constraints) {
                 codes += `\n    make.${this.constraintCodes(constraint)}`
@@ -322,30 +330,76 @@ export class UIView implements IRawParams {
     selfComponentCodes(): string {
         var codes = ""
 
-        if (this.isComponent || this.asFunction) {
-            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
-            codes += `private func create${componentName}() -> ${this.className} {`
+        if (this.isComponent) {
+            if (this.isClassComponent) {
+                codes += this.selfClassComponentCodes()
+            } else {
+                codes += this.selfFunctionComponentCodes()
+            }
+        }
 
-            codes += "\n"
-            codes += indent(this.selfViewCodes())
+        return codes
+    }
 
-            codes += "\n\n"
-            codes += indent(this.subviewsViewCodes())
+    selfFunctionComponentCodes(): string {
+        let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+        let codes = `private func create${componentName}() -> ${this.className} {`
 
-            if (this.subviews.length > 0) {
-                codes += "\n\n    // 约束"
+        // View Creation Codes
+        let viewCreationCodes = this.selfViewCodes()
+        viewCreationCodes += "\n\n"
+        viewCreationCodes += this.subviewsViewCodes()
+        if (this.subviews.length > 0
+            || (this.isComponent && this.constraints.length > 0)) {
+            viewCreationCodes += "\n\n// 约束"
 
-                if (this.asFunction) {
-                    codes += "\n\n"
-                    codes += indent(this.selfLayoutCodes())
-                }
-
-                codes += indent(this.subviewsLayoutCodes())
+            if (this.isComponent) {
+                viewCreationCodes += "\n\n"
+                viewCreationCodes += this.selfLayoutCodes()
             }
 
-            codes += indent(`\n\nreturn ${this.name}`)
-            codes += "\n}"
+            viewCreationCodes += this.subviewsLayoutCodes()
         }
+
+        codes += "\n"
+        codes += indent(viewCreationCodes)
+        codes += indent(`\n\nreturn ${this.name}`)
+        codes += "\n}"
+
+        return codes
+    }
+
+    selfClassComponentCodes(): string {
+        let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+        let codes = `class ${componentName}: ${this.className} {`
+
+        // View Creation Codes
+        let viewCreationCodes = this.selfViewCodes()
+        viewCreationCodes += "\n\n"
+        viewCreationCodes += this.subviewsViewCodes()
+        if (this.subviews.length > 0
+            || (this.isComponent && this.constraints.length > 0)) {
+            viewCreationCodes += "\n\n// 约束"
+
+            if (this.isComponent) {
+                viewCreationCodes += "\n\n"
+                viewCreationCodes += this.selfLayoutCodes()
+            }
+
+            viewCreationCodes += this.subviewsLayoutCodes()
+        }
+
+        codes += indent("\n\noverride init(frame: CGRect) {")
+        codes += indent("\nsuper.init(frame: frame)", 2)
+        codes += "\n\n"
+        codes += indent(viewCreationCodes, 2)
+        codes += indent("\n}")
+        codes += "\n\n"
+        codes += indent("required init?(coder aDecoder: NSCoder) {")
+        codes += indent(`\nfatalError("init(coder:) has not been implemented")`, 2)
+        codes += indent("\n}")
+        codes += indent(this.subviewsComponentCodes())
+        codes += "\n}"
 
         return codes
     }
@@ -405,7 +459,7 @@ export class UIView implements IRawParams {
         codes += `.${relationName}`
 
         if (constraint.toView) {
-            let toViewName = constraint.toView == this ? "self" : constraint.toView.name
+            let toViewName = constraint.toView.isClassComponent ? "self" : constraint.toView.name
             codes += `(${toViewName}`
 
             if (constraint.toAttribute) {

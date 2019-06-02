@@ -10,22 +10,27 @@
           <el-form-item label="名称" for="name">
             <el-input v-model="form.name" @input="onNameInput" id="name"></el-input>
           </el-form-item>
-          <el-form-item for="is-component" v-if="view && !view.isComponentInstance && !view.isRoot">
-            <el-checkbox v-model="form.isComponent" @input="onIsComponentInput" id="is-component">组件</el-checkbox>
+          <el-form-item v-if="view && !view.isComponentInstance">
+            <!-- 函数组件 -->
+            <el-checkbox
+              v-model="form.isFunctionComponent"
+              @input="onIsFunctionComponentInput"
+              id="is-function-component"
+            >{{view.isRoot ? "函数" : "函数组件"}}</el-checkbox>
+
+            <!-- 类组件 -->
+            <el-checkbox
+              v-model="form.isClassComponent"
+              @input="onIsClassComponentInput"
+              id="is-class-component"
+            >{{view.isRoot ? "类" : "类组件"}}</el-checkbox>
           </el-form-item>
-          <el-form-item
-            label="组件名"
-            for="component-name"
-            v-if="view && view.isComponent && !view.isRoot"
-          >
+          <el-form-item label="组件名" for="component-name" v-if="view && view.isComponent">
             <el-input
               :value="form.componentName|capitalize"
               @input="onComponentNameInput"
               id="component-name"
             ></el-input>
-          </el-form-item>
-          <el-form-item for="as-function" v-if="view && view.isRoot">
-            <el-checkbox v-model="form.asFunction" @input="onAsFunctionInput" id="is-component">函数形式</el-checkbox>
           </el-form-item>
         </el-form>
       </el-collapse-item>
@@ -93,9 +98,9 @@ import AddConstraintDialog from "@/components/AddConstraintDialog.vue";
 interface Form {
   name: string | null;
   className: string | null;
-  isComponent: boolean;
   componentName: string | null;
-  asFunction: boolean;
+  isFunctionComponent: boolean;
+  isClassComponent: boolean;
 }
 
 @Component({
@@ -113,15 +118,18 @@ export default class PropertiesPanel extends Vue {
   form: Form = {
     name: null,
     className: null,
-    isComponent: false,
     componentName: null,
-    asFunction: false
+    isFunctionComponent: false,
+    isClassComponent: false
   };
 
   created() {
     this.form.name = this.view ? this.view.name : null;
     this.form.className = this.view ? this.view.className : null;
-    this.form.isComponent = this.view ? this.view.isComponent : false;
+    this.form.isFunctionComponent = this.view
+      ? this.view.isFunctionComponent
+      : false;
+    this.form.isClassComponent = this.view ? this.view.isClassComponent : false;
     this.form.componentName = this.view ? this.view.componentName : null;
   }
 
@@ -180,7 +188,8 @@ export default class PropertiesPanel extends Vue {
   onViewChanged(val: UIView | null, oldVal: UIView | null) {
     this.form.name = val ? val.name : null;
     this.form.className = val ? val.className : null;
-    this.form.isComponent = val ? val.isComponent : false;
+    this.form.isFunctionComponent = val ? val.isFunctionComponent : false;
+    this.form.isClassComponent = val ? val.isClassComponent : false;
     this.form.componentName = val ? val.componentName : null;
   }
 
@@ -193,8 +202,19 @@ export default class PropertiesPanel extends Vue {
     this.$emit("update", { key: "name", value: val });
   }
 
-  onIsComponentInput(val: boolean) {
-    this.$emit("update", { key: "isComponent", value: val });
+  onIsFunctionComponentInput(val: boolean) {
+    this.$emit("update", { key: "isFunctionComponent", value: val });
+
+    // isFunctionComponent 与 isClassComponent 不能同时为 true
+    if (val && this.form.isClassComponent) {
+      this.form.isClassComponent = false;
+      this.$emit("update", { key: "isClassComponent", value: false });
+    }
+
+    this.$emit("update", {
+      key: "isComponent",
+      value: this.form.isFunctionComponent || this.form.isClassComponent
+    });
 
     if (this.view) {
       this.form.componentName = val ? capitalize(this.view.name) : null;
@@ -205,8 +225,27 @@ export default class PropertiesPanel extends Vue {
     }
   }
 
-  onAsFunctionInput(val: boolean) {
-    this.$emit("update", { key: "asFunction", value: val });
+  onIsClassComponentInput(val: boolean) {
+    this.$emit("update", { key: "isClassComponent", value: val });
+
+    // isFunctionComponent 与 isClassComponent 不能同时为 true
+    if (val && this.form.isFunctionComponent) {
+      this.form.isFunctionComponent = false;
+      this.$emit("update", { key: "isFunctionComponent", value: false });
+    }
+
+    this.$emit("update", {
+      key: "isComponent",
+      value: this.form.isFunctionComponent || this.form.isClassComponent
+    });
+
+    if (this.view) {
+      this.form.componentName = val ? capitalize(this.view.name) : null;
+      this.$emit("update", {
+        key: "componentName",
+        value: this.form.componentName
+      });
+    }
   }
 
   onComponentNameInput(val: string) {

@@ -32,6 +32,7 @@ export class UIButton extends UIView {
 
     selfViewCodes(): string {
         var codes = `let ${this.name} = UIButton()`
+        let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {
@@ -39,18 +40,18 @@ export class UIButton extends UIView {
         }
 
         // 标题
-        codes += `\n${this.name}.setTitle("${this.title || ""}".localized(), for: .normal)`
+        codes += `\n${prefix}setTitle("${this.title || ""}".localized(), for: .normal)`
 
         // 颜色
         let colorCodes = (this.titleColor || UIColor.black).codes
-        codes += `\n${this.name}.setTitleColor(${colorCodes}, for: .normal)`
+        codes += `\n${prefix}setTitleColor(${colorCodes}, for: .normal)`
 
         // Action
         let action = this.action ? `#selector(${this.action})` : "nil"
-        codes += `\n${this.name}.addTarget(self, action: ${action}, for: .touchUpInside)`
+        codes += `\n${prefix}addTarget(self, action: ${action}, for: .touchUpInside)`
 
         // font
-        codes += `\n${this.name}.titleLabel?.font = ${this.font.codes}`
+        codes += `\n${prefix}titleLabel?.font = ${this.font.codes}`
 
         return codes
     }

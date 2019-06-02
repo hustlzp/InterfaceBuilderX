@@ -22,17 +22,18 @@ export class UITableView extends UIView {
 
     selfViewCodes(): string {
         let codes = `let ${this.name} = UITableView()`
+        let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {
             codes += publicAttributesCodes
         }
 
-        codes += `\n${this.name}.delegate = self
-tableView.dataSource = self
-tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: ${this.footerHeight || 0}))
-tableView.estimatedRowHeight = ${this.estimatedRowHeight}
-tableView.register(${this.cellClass || 'UITableViewCell'}.self, forCellReuseIdentifier: "${this.cellReuseIdentifier || 'cellReuseIdentifier'}")`
+        codes += `\n${prefix}delegate = self
+${prefix}dataSource = self
+${prefix}tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: ${this.footerHeight || 0}))
+${prefix}estimatedRowHeight = ${this.estimatedRowHeight}
+${prefix}register(${this.cellClass || 'UITableViewCell'}.self, forCellReuseIdentifier: "${this.cellReuseIdentifier || 'cellReuseIdentifier'}")`
 
         return codes
     }

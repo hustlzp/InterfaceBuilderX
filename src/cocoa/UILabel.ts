@@ -22,6 +22,7 @@ export class UILabel extends UIView {
 
     selfViewCodes(): string {
         let codes = `let ${this.name} = UILabel()`
+        let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {
@@ -30,20 +31,20 @@ export class UILabel extends UIView {
 
         // textColor
         let colorCodes = (this.textColor || UIColor.black).codes
-        codes += `\n${this.name}.textColor = ${colorCodes}`
+        codes += `\n${prefix}textColor = ${colorCodes}`
 
         // font
-        codes += `\n${this.name}.font = ${this.font.codes}`
+        codes += `\n${prefix}font = ${this.font.codes}`
 
         let textCodes = `"${this.text || ''}".localized()`
         if (this.letterSpacing > 0) {
             // attributed text
 
             // letter spacing
-            codes += `\n${this.name}.attributedText = NSAttributedString(string: ${textCodes}, attributes: [.kern: ${this.letterSpacing}])`
+            codes += `\n${prefix}attributedText = NSAttributedString(string: ${textCodes}, attributes: [.kern: ${this.letterSpacing}])`
         } else {
             // plain text
-            codes += `\n${this.name}.text = ${textCodes}`
+            codes += `\n${prefix}text = ${textCodes}`
         }
 
         return codes

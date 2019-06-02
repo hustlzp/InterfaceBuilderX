@@ -29,7 +29,10 @@
             @blur="$set(node, 'editing', false)"
           >
           <span class="warning el-icon-warning" v-if="data.isLackOfConstraints"></span>
-          <span v-if="data.isComponent" class="component-flag">{{data.componentName}}</span>
+          <span
+            v-if="data.isComponent && !data.isRoot"
+            class="component-flag"
+          >{{data.componentName}}</span>
           <span
             v-if="data.isComponentInstance"
             class="component-instance-flag"
