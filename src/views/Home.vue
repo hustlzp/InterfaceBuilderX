@@ -353,19 +353,19 @@ export default class Home extends Vue {
       );
     }
 
-    if (
-      !this.selectedView ||
-      (!this.selectedView.isComponentInstance && !this.selectedView.isComponent)
-    ) {
-      menu.append(
-        new MenuItem({
-          label: "Add Component Instance",
-          click() {
-            that.addComponentInstanceDialogVisible = true;
-          }
-        })
-      );
-    }
+    // if (
+    //   !this.selectedView ||
+    //   (!this.selectedView.isComponentInstance && !this.selectedView.isComponent)
+    // ) {
+    menu.append(
+      new MenuItem({
+        label: "Add Component Instance",
+        click() {
+          that.addComponentInstanceDialogVisible = true;
+        }
+      })
+    );
+    // }
 
     if (view) {
       menu.append(

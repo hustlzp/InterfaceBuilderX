@@ -123,6 +123,7 @@ export class UIView implements IRawParams {
     isComponent: boolean = false
     isFunctionComponent: boolean = false    // 函数组件
     isClassComponent: boolean = false   // 类组件
+    isClassProperty: boolean = false    // 类组件的属性
     // 组件名称
     componentName: string | null = null
     // 组件实例列表
@@ -196,9 +197,31 @@ export class UIView implements IRawParams {
     subviewIterator(callback: (view: UIView) => void): void {
         for (const subview of this.subviews) {
             callback(subview)
+            subview.subviewIterator(callback)
+        }
+    }
 
-            if (subview.subviews.length > 0) {
-                subview.subviewIterator(callback)
+    get properties(): UIView[] {
+        if (!this.isClassComponent) {
+            return []
+        }
+
+        let properties: UIView[] = []
+        this.classComponentPropertiesIterator((view) => {
+            properties.push(view)
+        })
+
+        return properties
+    }
+
+    classComponentPropertiesIterator(callback: (view: UIView) => void): void {
+        for (const subview of this.subviews) {
+            if (subview.isClassProperty) {
+                callback(subview)
+            }
+
+            if (!subview.isClassComponent) {
+                subview.classComponentPropertiesIterator(callback)
             }
         }
     }
@@ -210,6 +233,10 @@ export class UIView implements IRawParams {
             subview.constraintIterator(callback)
         }
     }
+
+    /**
+     * Codes
+     */
 
     codes(): string {
         var codes = this.isComponent ? "" : this.viewCodes(null)
@@ -245,11 +272,13 @@ export class UIView implements IRawParams {
 
         if (this.isComponent || this.isComponentInstance) {
             let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+            let prefix = this.isClassProperty ? "" : "let "
+            let name = this.name
 
             if (this.isClassComponent || (this.component && this.component.isClassComponent)) {
-                codes += `let ${this.name} = ${componentName}()`
+                codes += `${prefix}${name} = ${componentName}()`
             } else {
-                codes += `let ${this.name} = create${componentName}()`
+                codes += `${prefix}${name} = create${componentName}()`
             }
         } else {
             codes += this.selfViewCodes()
@@ -307,7 +336,8 @@ export class UIView implements IRawParams {
 
     // 自身 View 代码
     selfViewCodes(): string {
-        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
+        let prefix = this.isClassProperty ? "" : "let "
+        let codes = this.isClassComponent ? "" : `${prefix}${this.name} = ${this.className}()`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {
@@ -394,6 +424,12 @@ export class UIView implements IRawParams {
 
         let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
         let codes = `class ${componentName}: ${this.className} {`
+
+        // Properties Codes
+        for (const property of this.properties) {
+            codes += "\n"
+            codes += indent(`var ${property.name}: ${property.isClassComponent ? capitalize(property.componentName!) : property.className}!`)
+        }
 
         // View Creation Codes
         let viewCreationCodes = this.selfViewCodes()
