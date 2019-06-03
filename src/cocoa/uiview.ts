@@ -421,7 +421,7 @@ export class UIView implements IRawParams {
         codes += indent(`\nfatalError("init(coder:) has not been implemented")`, 2)
         codes += indent("\n}")
         codes += indent(this.subviewsFunctionComponentCodes())
-        codes += "\n}"
+        codes += "\n\n}"
 
         return codes
     }
