@@ -75,7 +75,7 @@
           </div>
         </div>
 
-        <div class="el-icon-warning constraint-warning" v-if="view && view.constraints.length == 0"></div>
+        <div class="el-icon-warning constraint-warning" v-if="view && view.isLackOfConstraints"></div>
 
         <el-button
           type="primary"
