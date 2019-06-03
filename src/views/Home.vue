@@ -330,10 +330,10 @@ export default class Home extends Vue {
       this.selectedView = view;
     }
 
-    if (!this.selectedView || !this.selectedView.isComponentInstance) {
+    if (!(this.selectedView && this.selectedView.isComponentInstance)) {
       menu.append(
         new MenuItem({
-          label: "Add Subview",
+          label: this.views.length > 0 ? "Add Subview" : "Add Root View",
           click() {
             that.viewForUpdating = null;
             that.addViewDialogVisible = true;
@@ -357,15 +357,16 @@ export default class Home extends Vue {
     //   !this.selectedView ||
     //   (!this.selectedView.isComponentInstance && !this.selectedView.isComponent)
     // ) {
-    menu.append(
-      new MenuItem({
-        label: "Add Component Instance",
-        click() {
-          that.addComponentInstanceDialogVisible = true;
-        }
-      })
-    );
-    // }
+    if (this.components.length > 0) {
+      menu.append(
+        new MenuItem({
+          label: "Add Component Instance",
+          click() {
+            that.addComponentInstanceDialogVisible = true;
+          }
+        })
+      );
+    }
 
     if (view) {
       menu.append(

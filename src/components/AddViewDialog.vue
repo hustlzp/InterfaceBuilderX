@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="view ? 'Edit View' : 'Add Subview'"
+    :title="view ? 'Edit View' : 'Add View'"
     :visible.sync="dialogVisible"
     @open="initData"
     @opened="opened"
