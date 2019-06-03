@@ -28,7 +28,7 @@
           <el-form-item
             :label="view.isFunctionComponent ? '组件名' : '组件名'"
             for="component-name"
-            v-if="view && view.isComponent"
+            v-if="view && view.isComponent && !view.isRoot"
           >
             <el-input
               :value="form.componentName|capitalize"
