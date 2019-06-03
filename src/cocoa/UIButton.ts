@@ -31,7 +31,7 @@ export class UIButton extends UIView {
     // }
 
     selfViewCodes(): string {
-        var codes = `let ${this.name} = UIButton()`
+        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
         let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()

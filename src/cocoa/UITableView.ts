@@ -21,7 +21,7 @@ export class UITableView extends UIView {
     // }
 
     selfViewCodes(): string {
-        let codes = `let ${this.name} = UITableView()`
+        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
         let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()

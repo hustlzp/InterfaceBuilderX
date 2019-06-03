@@ -5,12 +5,14 @@ import { UIImageView } from './UIImageView';
 import { UITableView } from './UITableView';
 import { UIStackView } from './UIStackView';
 import { UITextField } from './UITextField';
+import { UITableViewCell } from './UITableViewCell';
 
 export * from './UIView'
 export * from './UILabel'
 export * from './UIButton'
 export * from './UIImageView'
 export * from './UITableView'
+export * from './UITableViewCell'
 export * from './UITextField'
 export * from './AutoLayout'
 export * from './UIStackView'
@@ -21,6 +23,7 @@ export const ViewClasses: { new(): UIView }[] = [
     UIButton,
     UIImageView,
     UITableView,
+    UITableViewCell,
     UIStackView,
     UITextField
 ]

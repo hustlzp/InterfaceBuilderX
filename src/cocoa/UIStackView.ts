@@ -28,7 +28,7 @@ export class UIStackView extends UIView {
     distribution: UIStackViewDistribution = UIStackViewDistribution.fill
 
     selfViewCodes(): string {
-        let codes = `let ${this.name} = UIStackView(arrangedSubviews: [${this.subviews.map(subview => subview.name).join(', ')}])`
+        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
         let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
@@ -47,61 +47,107 @@ export class UIStackView extends UIView {
         return codes
     }
 
-    viewCodes(superview: UIView | null): string {
-        let codes = ""
+    // viewCodes(superview: UIView | null): string {
+    //     let codes = ""
 
-        if (!this.isComponent && !this.isComponentInstance) {
-            codes += this.subviewsViewCodes()
-        }
+    //     if (!this.isComponent && !this.isComponentInstance) {
+    //         codes += this.subviewsViewCodes()
+    //     }
 
-        codes += "\n\n"
-        if (this.isComponent || this.isComponentInstance) {
-            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+    //     codes += "\n\n"
+    //     if (this.isComponent || this.isComponentInstance) {
+    //         let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
 
-            if (this.isClassComponent) {
-                codes += `let ${this.name} = create${componentName}()`
-            } else {
-                codes += `let ${this.name} = ${componentName}()`
-            }
-        } else {
-            codes += this.selfViewCodes()
-        }
+    //         if (this.isClassComponent || (this.component && this.component.isClassComponent)) {
+    //             codes += `let ${this.name} = create${componentName}()`
+    //         } else {
+    //             codes += `let ${this.name} = ${componentName}()`
+    //         }
+    //     } else {
+    //         codes += this.selfViewCodes()
+    //     }
 
-        if (superview) {
-            codes += `\n${superview.name}.addSubview(${this.name})`
-        }
+    //     if (superview) {
+    //         if (superview.className == "UIStackView") {
+    //             codes += `\n${prefix}addArrangedSubview(${this.name})`
+    //         } else {
+    //             codes += `\n${prefix}addSubview(${this.name})`
+    //         }
+    //         codes += `\n${superview.name}.addSubview(${this.name})`
+    //     }
 
-        return codes
-    }
+    //     return codes
+    // }
 
-    selfComponentCodes(): string {
-        var codes = ""
+    // selfFunctionComponentCodes(): string {
+    //     if (!this.isFunctionComponent) {
+    //         return ""
+    //     }
 
-        if (this.isComponent) {
-            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
-            codes += `private func create${componentName}() -> ${this.className} {`
+    //     let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+    //     let codes = `private func create${componentName}() -> ${this.className} {`
 
-            codes += indent(this.subviewsViewCodes().substr(1))
+    //     // View Creation Codes
+    //     let viewCreationCodes = this.subviewsViewCodes()
+    //     viewCreationCodes += "\n\n"
+    //     viewCreationCodes += this.selfViewCodes()
+    //     if (this.subviews.length > 0
+    //         || (this.isComponent && this.constraints.length > 0)) {
+    //         viewCreationCodes += "\n\n// 约束"
 
-            codes += "\n\n"
-            codes += indent(this.selfViewCodes())
+    //         if (this.isComponent) {
+    //             viewCreationCodes += "\n\n"
+    //             viewCreationCodes += this.selfLayoutCodes()
+    //         }
 
-            if (this.subviews.length > 0) {
-                codes += "\n\n    // 约束"
+    //         viewCreationCodes += this.subviewsLayoutCodes()
+    //     }
 
-                if (this.isComponent) {
-                    codes += "\n\n"
-                    codes += indent(this.selfLayoutCodes())
-                }
+    //     codes += "\n"
+    //     codes += indent(viewCreationCodes)
+    //     codes += indent(`\n\nreturn ${this.name}`)
+    //     codes += "\n}"
 
-                codes += indent(this.subviewsLayoutCodes())
-            }
+    //     return codes
+    // }
 
-            codes += indent(`\n\nreturn ${this.name}`)
-            codes += "\n}"
-        }
+    // selfClassComponentCodes(): string {
+    //     if (!this.isClassComponent) {
+    //         return ""
+    //     }
 
-        return codes
-    }
+    //     let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+    //     let codes = `class ${componentName}: ${this.className} {`
+
+    //     // View Creation Codes
+    //     let viewCreationCodes = this.subviewsViewCodes()
+    //     viewCreationCodes += "\n\n"
+    //     viewCreationCodes += this.selfViewCodes()
+    //     if (this.subviews.length > 0
+    //         || (this.isComponent && this.constraints.length > 0)) {
+    //         viewCreationCodes += "\n\n// 约束"
+
+    //         if (this.isComponent) {
+    //             viewCreationCodes += "\n\n"
+    //             viewCreationCodes += this.selfLayoutCodes()
+    //         }
+
+    //         viewCreationCodes += this.subviewsLayoutCodes()
+    //     }
+
+    //     codes += indent("\n\noverride init(frame: CGRect) {")
+    //     codes += indent("\nsuper.init(frame: frame)", 2)
+    //     codes += "\n\n"
+    //     codes += indent(viewCreationCodes, 2)
+    //     codes += indent("\n}")
+    //     codes += "\n\n"
+    //     codes += indent("required init?(coder aDecoder: NSCoder) {")
+    //     codes += indent(`\nfatalError("init(coder:) has not been implemented")`, 2)
+    //     codes += indent("\n}")
+    //     codes += indent(this.subviewsFunctionComponentCodes())
+    //     codes += "\n}"
+
+    //     return codes
+    // }
 
 }

@@ -9,7 +9,7 @@ export class UIImageView extends UIView {
     // }
 
     selfViewCodes(): string {
-        let codes = `let ${this.name} = UIImageView()`
+        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
         let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
