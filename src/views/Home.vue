@@ -491,7 +491,7 @@ export default class Home extends Vue {
 }
 
 .properties-panel {
-  width: 360px;
+  width: 375px;
   position: fixed;
   top: 0;
   right: 0;

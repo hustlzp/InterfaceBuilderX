@@ -4,6 +4,7 @@
     <el-input v-if="isNumber" v-model.number="value" :id="attribute.key"></el-input>
     <color-property-form-item v-if="isColor" :attribute="attribute" v-model="value"></color-property-form-item>
     <font-property-form-item v-if="isFont" :attribute="attribute" v-model="value"></font-property-form-item>
+    <image-property-form-item v-if="isImage" :attribute="attribute" v-model="value"></image-property-form-item>
     <el-select v-model="value" placeholder="请选择" v-if="isEnum">
       <el-option
         v-for="enum_ in attribute.enums"
@@ -20,11 +21,13 @@ import { UIView, UIViewAttribute, UIColor } from "@/cocoa";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import FontPropertyFormItem from "@/components/FontPropertyFormItem.vue";
 import ColorPropertyFormItem from "@/components/ColorPropertyFormItem.vue";
+import UIImagePropertyFormItem from "@/components/UIImagePropertyFormItem.vue";
 
 @Component({
   components: {
     FontPropertyFormItem,
-    ColorPropertyFormItem
+    ColorPropertyFormItem,
+    "image-property-form-item": UIImagePropertyFormItem
   }
 })
 export default class PropertyFormItem extends Vue {
@@ -96,6 +99,14 @@ export default class PropertyFormItem extends Vue {
       this.attribute.type.name == "UIFont"
     );
   }
+
+  get isImage(): boolean {
+    return (
+      typeof this.attribute.type == "function" &&
+      this.attribute.type.name == "UIImage"
+    );
+  }
+
   get isEnum(): boolean {
     return (
       typeof this.attribute.type == "function" &&

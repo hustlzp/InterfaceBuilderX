@@ -1,4 +1,4 @@
-import { UIView, attribute, UIFont, UIColor } from './UIView';
+import { UIView, attribute, UIFont, UIColor, UIImage } from './UIView';
 import { capitalize } from '@/utils';
 
 export class UIButton extends UIView {
@@ -20,6 +20,12 @@ export class UIButton extends UIView {
     @attribute(UIColor, "文本颜色")
     titleColor: UIColor | null = UIColor.black
 
+    @attribute(UIImage, "Image")
+    image: UIImage | null = null
+
+    @attribute(UIImage, "Highlighted Image")
+    highlightedImage: UIImage | null = null
+
     @attribute(UIFont, "字体")
     font: UIFont = UIFont.system(17)
 
@@ -39,12 +45,24 @@ export class UIButton extends UIView {
             codes += publicAttributesCodes
         }
 
-        // 标题
-        codes += `\n${prefix}setTitle("${this.title || ""}".localized(), for: .normal)`
+        if (this.image || this.hi) {
+            // 图片
+            if (this.image) {
+                codes += `\n${prefix}setImage(${this.image.codes}, for: .normal)`
+            }
 
-        // 颜色
-        let colorCodes = (this.titleColor || UIColor.black).codes
-        codes += `\n${prefix}setTitleColor(${colorCodes}, for: .normal)`
+            // Highlighted Image
+            if (this.highlightedImage) {
+                codes += `\n${prefix}setImage(${this.highlightedImage.codes}, for: .highlighted)`
+            }
+        } else {
+            // 文本
+            codes += `\n${prefix}setTitle("${this.title || ""}".localized(), for: .normal)`
+
+            // 文本颜色
+            let colorCodes = (this.titleColor || UIColor.black).codes
+            codes += `\n${prefix}setTitleColor(${colorCodes}, for: .normal)`
+        }
 
         // Action
         let action = this.action ? `#selector(${this.action})` : "nil"

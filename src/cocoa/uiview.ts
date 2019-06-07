@@ -76,6 +76,18 @@ export class UIFont {
     }
 }
 
+export class UIImage {
+    name!: string
+
+    constructor(name: string) {
+        this.name = name
+    }
+
+    get codes(): string {
+        return `UIImage(named: "${this.name}")`
+    }
+}
+
 export interface UIViewAttribute {
     key: string
     value: any
@@ -367,7 +379,7 @@ export class UIView implements IRawParams {
     // 自身 Layout 代码
     selfLayoutCodes(): string {
         let codes = ""
-        let prefix = this.isClassComponent ? "" : `${this.name}.`
+        let prefix = `${this.name}.`
 
         // 自身约束代码
         if (this.constraints.length > 0) {
@@ -400,10 +412,10 @@ export class UIView implements IRawParams {
             || (this.isComponent && this.constraints.length > 0)) {
             viewCreationCodes += "\n\n// 约束"
 
-            if (this.isComponent) {
-                viewCreationCodes += "\n\n"
-                viewCreationCodes += this.selfLayoutCodes()
-            }
+            // if (this.isComponent) {
+            //     viewCreationCodes += "\n\n"
+            //     viewCreationCodes += this.selfLayoutCodes()
+            // }
 
             viewCreationCodes += this.subviewsLayoutCodes()
         }
@@ -439,10 +451,10 @@ export class UIView implements IRawParams {
             || (this.isComponent && this.constraints.length > 0)) {
             viewCreationCodes += "\n\n// 约束"
 
-            if (this.isComponent) {
-                viewCreationCodes += "\n\n"
-                viewCreationCodes += this.selfLayoutCodes()
-            }
+            // if (this.isComponent) {
+            //     viewCreationCodes += "\n\n"
+            //     viewCreationCodes += this.selfLayoutCodes()
+            // }
 
             viewCreationCodes += this.subviewsLayoutCodes()
         }

@@ -22,7 +22,7 @@ export class UIStackView extends UIView {
     spacing: number = 0
 
     @enumAttribute(LayoutAxis, "Axis")
-    axis: LayoutAxis = LayoutAxis.vertical
+    axis: LayoutAxis = LayoutAxis.horizontal
 
     @enumAttribute(UIStackViewDistribution, "Distribution")
     distribution: UIStackViewDistribution = UIStackViewDistribution.fill

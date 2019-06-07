@@ -3,7 +3,7 @@
     <el-collapse v-model="activeNames">
       <!-- 基本 -->
       <el-collapse-item title="基本" name="basic">
-        <el-form ref="form" label-width="110px" size="small">
+        <el-form ref="form" label-width="135px" size="small">
           <el-form-item label="类">
             <span class="static-text-value class-name">{{form.className}}</span>
           </el-form-item>
@@ -48,7 +48,7 @@
 
       <!-- 属性 -->
       <el-collapse-item title="属性" name="attributes" v-if="view && !view.isComponentInstance">
-        <el-form ref="form" label-width="110px" size="small">
+        <el-form ref="form" label-width="130px" size="small">
           <property-form-item
             v-for="attribute in attributes"
             :key="view.id + '.' + attribute.key"

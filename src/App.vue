@@ -42,6 +42,7 @@ export default Vue.extend({
 }
 .el-form-item.el-form-item--small .el-form-item__label {
   // font-size: 12px;
+  // line-height: initial;
 }
 .el-form-item.el-form-item--small .static-text-value {
   // line-height: 32px;
