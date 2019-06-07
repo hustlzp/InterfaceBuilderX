@@ -31,7 +31,7 @@ export default class UIImagePropertyFormItem extends Vue {
   nameChanged() {
     if (!this.name) {
       this.$emit("input", null);
-      return
+      return;
     }
 
     this.$emit("input", new UIImage(this.name!));
