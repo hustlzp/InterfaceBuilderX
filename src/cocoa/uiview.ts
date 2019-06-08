@@ -283,7 +283,10 @@ export class UIView implements IRawParams {
         var codes = ""
 
         if (this.isComponent || this.isComponentInstance) {
-            let componentName = this.isRoot ? capitalize(this.name) : capitalize(this.componentName!)
+            let componentName = this.isRoot ?
+                capitalize(this.name) :
+                this.isComponentInstance ?
+                    capitalize(this.component!.componentName!) : capitalize(this.componentName!)
             let prefix = this.isClassProperty ? "" : "let "
             let name = this.name
 
