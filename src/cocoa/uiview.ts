@@ -300,7 +300,16 @@ export class UIView implements IRawParams {
         }
 
         if (superview) {
-            let prefix = superview.isClassComponent ? "" : `${superview.name}.`
+            var prefix = ""
+            if (superview.isClassComponent) {
+                if (superview.className == "UITableViewCell") {
+                    prefix = "contentView."
+                } else {
+                    prefix = ""
+                }
+            } else {
+                prefix = `${superview.name}.`
+            }
 
             if (superview.className == "UIStackView") {
                 codes += `\n${prefix}addArrangedSubview(${this.name})`
@@ -443,7 +452,7 @@ export class UIView implements IRawParams {
         // Properties Codes
         for (const property of this.properties) {
             codes += "\n"
-            codes += indent(`var ${property.name}: ${property.isClassComponent ? capitalize(property.componentName!) : property.className}!`)
+            codes += indent(`private var ${property.name}: ${property.isClassComponent ? capitalize(property.componentName!) : property.className}!`)
         }
 
         // View Creation Codes
@@ -559,7 +568,16 @@ export class UIView implements IRawParams {
         codes += `.${relationName}`
 
         if (constraint.toView) {
-            let toViewName = constraint.toView.isClassComponent ? "self" : constraint.toView.name
+            var toViewName = ""
+            if (this.superview == constraint.toView && constraint.toView.isClassComponent) {
+                if (constraint.toView.className == "UITableViewCell") {
+                    toViewName = "contentView"
+                } else {
+                    toViewName = "self"
+                }
+            } else {
+                toViewName = constraint.toView.name
+            }
             codes += `(${toViewName}`
 
             if (constraint.toAttribute) {
