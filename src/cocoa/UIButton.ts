@@ -37,13 +37,8 @@ export class UIButton extends UIView {
     // }
 
     selfViewCodes(): string {
-        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
+        let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
-
-        let publicAttributesCodes = this.publicSelfViewAttributesCodes()
-        if (publicAttributesCodes) {
-            codes += publicAttributesCodes
-        }
 
         if (this.image || this.hi) {
             // 图片

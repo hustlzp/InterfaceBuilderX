@@ -27,13 +27,8 @@ export class UITableViewCell extends UIView {
     accessoryType: UITableViewCellAccessoryType = UITableViewCellAccessoryType.none
 
     selfViewCodes(): string {
-        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
+        let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
-
-        let publicAttributesCodes = this.publicSelfViewAttributesCodes()
-        if (publicAttributesCodes) {
-            codes += publicAttributesCodes
-        }
 
         if (this.selectionStyle != UITableViewCellSelectionStyle.default) {
             codes += `\n${prefix}selectionStyle = .${this.getEnumKeyForValue(UITableViewCellSelectionStyle, this.selectionStyle)}`

@@ -12,13 +12,8 @@ export class UIImageView extends UIView {
     image: UIImage | null = null
 
     selfViewCodes(): string {
-        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
+        let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
-
-        let publicAttributesCodes = this.publicSelfViewAttributesCodes()
-        if (publicAttributesCodes) {
-            codes += publicAttributesCodes
-        }
 
         if (this.image) {
             codes += `${prefix}image = ${this.image.codes}`

@@ -360,8 +360,14 @@ export class UIView implements IRawParams {
 
     // 自身 View 代码
     selfViewCodes(): string {
-        let prefix = this.isClassProperty ? "" : "let "
-        let codes = this.isClassComponent ? "" : `${prefix}${this.name} = ${this.className}()`
+        let codes = ""
+
+        if (!this.isClassComponent) {
+            if (!this.isClassProperty) {
+                codes += "let "
+            }
+            codes += `${this.name} = ${this.className}()`
+        }
 
         let publicAttributesCodes = this.publicSelfViewAttributesCodes()
         if (publicAttributesCodes) {

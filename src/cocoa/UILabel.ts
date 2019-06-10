@@ -21,13 +21,8 @@ export class UILabel extends UIView {
     // }
 
     selfViewCodes(): string {
-        let codes = this.isClassComponent ? "" : `let ${this.name} = ${this.className}()`
+        let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
-
-        let publicAttributesCodes = this.publicSelfViewAttributesCodes()
-        if (publicAttributesCodes) {
-            codes += publicAttributesCodes
-        }
 
         // textColor
         let colorCodes = (this.textColor || UIColor.black).codes
