@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { UIFont, UIFontWeight, UIViewAttribute } from "../cocoa";
+import { UIFont, UIFontWeight, UIViewAttribute } from "@/cocoa";
 
 @Component
 export default class FontPropertyFormItem extends Vue {

@@ -1,4 +1,4 @@
-import { UIColor, UIView, UIFont, attribute } from './UIView';
+import { UIColor, UIView, UIFont, attribute, UIEdgeInsets } from './UIView';
 
 export class UICollectionView extends UIView {
     name: string = "collectionView"
@@ -13,11 +13,17 @@ export class UICollectionView extends UIView {
     @attribute(Number, "Item Size Width")
     itemSizeWidth: number = 0
 
+    @attribute(Number, "Item Size Height")
+    itemSizeHeight: number = 0
+
     @attribute(Number, "Line Spacing")
     minimumLineSpacing: number = 0
 
     @attribute(Number, "Interitem Spacing")
     minimumInteritemSpacing: number = 0
+
+    @attribute(UIEdgeInsets, "Section Inset")
+    sectionInset: UIEdgeInsets | null = null
 
     // constructor() {
     //     super()
@@ -34,10 +40,13 @@ ${prefix}register(${this.cellClass || 'UICollectionViewCell'}.self, forCellReuse
         codes += `\n\nlet layout = UICollectionViewFlowLayout()
 layout.itemSize = CGSize(width: ${this.itemSizeWidth}, height: ${this.itemSizeHeight})
 layout.minimumLineSpacing = ${this.minimumLineSpacing}
-layout.minimumInteritemSpacing = ${this.minimumInteritemSpacing}
-layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-${prefix}collectionViewLayout = layout
-`
+layout.minimumInteritemSpacing = ${this.minimumInteritemSpacing}`
+
+        if (this.sectionInset) {
+            codes += `\nlayout.sectionInset = ${this.sectionInset.codes}`
+        }
+
+        codes += `\n${prefix}collectionViewLayout = layout`
 
         return codes
     }

@@ -95,8 +95,11 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="Constant">
+      <el-form-item label="Constant" v-if="!showEdgeInsetsControl">
         <el-input v-model="form.constant" placeholder></el-input>
+      </el-form-item>
+      <el-form-item label="Constant" v-if="showEdgeInsetsControl">
+        <edge-insets-form-item v-model="form.edgeInsetsConstant"></edge-insets-form-item>
       </el-form-item>
       <el-form-item label="Multiplier">
         <el-input v-model.number="form.multiplier" type="number" placeholder></el-input>
@@ -121,12 +124,14 @@ import {
   UITextField,
   AutoLayoutAttribute,
   AutoLayoutRelation,
-  AutoLayoutConstraint
+  AutoLayoutConstraint,
+  UIEdgeInsets
 } from "@/cocoa";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { ElInput } from "element-ui/types/input";
 import { ElSelect } from "element-ui/types/select";
 import { IRawParams } from "../utils";
+import UIEdgeInsetsFormItem from "@/components/property/UIEdgeInsetsFormItem.vue";
 
 interface Form extends IRawParams {
   attribute: AutoLayoutAttribute | null;
@@ -136,9 +141,14 @@ interface Form extends IRawParams {
   toAttribute: AutoLayoutAttribute | null;
   multiplier: number | null;
   constant: number | null;
+  edgeInsetsConstant: UIEdgeInsets | null;
 }
 
-@Component
+@Component({
+  components: {
+    "edge-insets-form-item": UIEdgeInsetsFormItem
+  }
+})
 export default class AddConstraintDialog extends Vue {
   @Prop(Boolean) visible!: boolean;
   @Prop(AutoLayoutConstraint) constraint!: AutoLayoutConstraint | null;
@@ -153,7 +163,8 @@ export default class AddConstraintDialog extends Vue {
     toView: null,
     toAttribute: null,
     multiplier: null,
-    constant: null
+    constant: null,
+    edgeInsetsConstant: null
   };
   relations = [
     { key: "equalTo", value: AutoLayoutRelation.equal },
@@ -207,6 +218,11 @@ export default class AddConstraintDialog extends Vue {
       return;
     }
 
+    if (this.showEdgeInsetsControl && !this.form.edgeInsetsConstant) {
+      this.$message.error("Constant 填写不完整");
+      return;
+    }
+
     if (this.constraint) {
       let constraint = new AutoLayoutConstraint(
         this.view,
@@ -215,7 +231,9 @@ export default class AddConstraintDialog extends Vue {
         this.form.toView,
         this.form.toAttribute,
         this.form.multiplier,
-        this.form.constant
+        this.showEdgeInsetsControl
+          ? this.form.edgeInsetsConstant
+          : this.form.constant
       );
       constraint.id = this.constraint.id;
       this.$emit("update", constraint);
@@ -228,7 +246,9 @@ export default class AddConstraintDialog extends Vue {
           this.form.toView,
           this.form.toAttribute,
           this.form.multiplier,
-          this.form.constant
+          this.showEdgeInsetsControl
+            ? this.form.edgeInsetsConstant
+            : this.form.constant
         );
 
         this.$emit("create", constraint);
@@ -243,7 +263,21 @@ export default class AddConstraintDialog extends Vue {
   initData() {
     Object.keys(this.form).forEach(key => {
       if (this.constraint) {
-        this.form[key] = this.constraint[key];
+        if (key == "constant") {
+          if (!(this.constraint.constant instanceof UIEdgeInsets)) {
+            this.form.constant = this.constraint.constant;
+          } else {
+            this.form.constant = null;
+          }
+        } else if (key == "edgeInsetsConstant") {
+          if (this.constraint.constant instanceof UIEdgeInsets) {
+            this.form.edgeInsetsConstant = this.constraint.constant;
+          } else {
+            this.form.edgeInsetsConstant = null;
+          }
+        } else {
+          this.form[key] = this.constraint[key];
+        }
       }
     });
   }
@@ -260,6 +294,7 @@ export default class AddConstraintDialog extends Vue {
     this.form.toAttribute = null;
     this.form.multiplier = null;
     this.form.constant = null;
+    this.form.edgeInsetsConstant = null;
   }
 
   get title(): string {
@@ -272,6 +307,17 @@ export default class AddConstraintDialog extends Vue {
     // title += this.constraint ? "Edit Constraint" : "Add Constraint";
 
     return title;
+  }
+
+  get showEdgeInsetsControl(): boolean {
+    if (!this.constraint) {
+      return (
+        this.form.attributes.length == 1 &&
+        this.form.attributes[0] == AutoLayoutAttribute.edges
+      );
+    } else {
+      return this.form.attribute == AutoLayoutAttribute.edges;
+    }
   }
 
   @Watch("dialogVisible")
@@ -287,7 +333,8 @@ export default class AddConstraintDialog extends Vue {
 </script>
 
 <style scoped lang="scss">
-.el-input {
+.el-input,
+.ui-edge-insets-form-item {
   width: 300px;
 }
 

@@ -88,6 +88,24 @@ export class UIImage {
     }
 }
 
+export class UIEdgeInsets {
+    top!: number
+    left!: number
+    bottom!: number
+    right!: number
+
+    constructor(top: number, left: number, bottom: number, right: number) {
+        this.top = top
+        this.left = left
+        this.bottom = bottom
+        this.right = right
+    }
+
+    get codes(): string {
+        return `UIEdgeInsets(top: ${this.top}, left: ${this.left}, bottom: ${this.bottom}, right: ${this.right})`
+    }
+}
+
 export interface UIViewAttribute {
     key: string
     value: any
@@ -251,9 +269,13 @@ export class UIView implements IRawParams {
      */
 
     codes(): string {
-        var codes = this.isComponent ? "" : this.viewCodes(null)
+        var codes = ""
 
-        if (this.subviews.length > 0 && !this.isComponent) {
+        if (!this.isComponent) {
+            codes += this.viewCodes(null)
+        }
+
+        if (!this.isComponent && (this.constraints.length > 0 || this.subviews.length > 0)) {
             codes += "\n\n// 约束"
             codes += "\n\n"
             codes += this.layoutCodes(null)
@@ -593,12 +615,20 @@ export class UIView implements IRawParams {
             }
 
             if (constraint.constant) {
-                codes += `.offset(${constraint.constant})`
+                if (constraint.constant instanceof UIEdgeInsets) {
+                    codes += `.insets(${constraint.constant.codes})`
+                } else {
+                    codes += `.offset(${constraint.constant})`
+                }
             } else if (constraint.multiplier) {
                 codes += `.multipliedBy(${constraint.multiplier})`
             }
         } else if (constraint.constant) {
-            codes += `(${constraint.constant})`
+            if (constraint.constant instanceof UIEdgeInsets) {
+                codes += `(${constraint.constant.codes})`
+            } else {
+                codes += `(${constraint.constant})`
+            }
         }
 
         return codes
@@ -632,16 +662,26 @@ export class UIView implements IRawParams {
             }
 
             if (constraint.constant) {
-                if (constraint.constant >= 0) {
-                    codes += ` + ${constraint.constant}`
+                if (typeof constraint.constant == "number") {
+                    if (constraint.constant >= 0) {
+                        codes += ` + ${constraint.constant}`
+                    } else {
+                        codes += ` - ${Math.abs(constraint.constant)}`
+                    }
+                } else if (constraint.constant instanceof UIEdgeInsets) {
+                    codes += ` + (${constraint.constant.top}, ${constraint.constant.left}, ${constraint.constant.bottom}, ${constraint.constant.right})`
                 } else {
-                    codes += ` - ${Math.abs(constraint.constant)}`
+                    codes += `${constraint.constant}`
                 }
             } else if (constraint.multiplier) {
                 codes += ` * ${constraint.multiplier}`
             }
         } else if (constraint.constant) {
-            codes += ` ${constraint.constant}`
+            if (constraint.constant instanceof UIEdgeInsets) {
+                codes += ` (${constraint.constant.top}, ${constraint.constant.left}, ${constraint.constant.bottom}, ${constraint.constant.right})`
+            } else {
+                codes += ` ${constraint.constant}`
+            }
         }
 
         return codes

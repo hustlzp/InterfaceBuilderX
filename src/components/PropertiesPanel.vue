@@ -103,7 +103,7 @@
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { capitalize } from "@/utils";
 import { UIViewAttribute, UIView, AutoLayoutConstraint } from "@/cocoa";
-import PropertyFormItem from "@/components/PropertyFormItem.vue";
+import PropertyFormItem from "@/components/property/PropertyFormItem.vue";
 import AddConstraintDialog from "@/components/AddConstraintDialog.vue";
 
 interface Form {

@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { UIViewAttribute, UIImage, UIImageView } from "../cocoa";
+import { UIViewAttribute, UIImage, UIImageView } from "@/cocoa";
 
 @Component({
   components: {}

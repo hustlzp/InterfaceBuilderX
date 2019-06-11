@@ -26,6 +26,7 @@
             type="text"
             v-if="node.editing"
             autofocus
+            @keyup.enter="$event.target.blur()"
             @blur="$set(node, 'editing', false)"
           >
           <span class="warning el-icon-warning" v-if="data.isLackOfConstraints"></span>

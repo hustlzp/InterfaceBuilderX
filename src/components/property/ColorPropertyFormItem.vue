@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { UIColor, UIViewAttribute } from "../cocoa";
+import { UIColor, UIViewAttribute } from "@/cocoa";
 
 @Component({
   components: {}

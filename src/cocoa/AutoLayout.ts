@@ -1,4 +1,4 @@
-import { UIView } from '@/cocoa/UIView';
+import { UIView, UIEdgeInsets } from '@/cocoa/UIView';
 import uuidv4 from 'uuid/v4';
 import { IRawParams } from '@/utils';
 
@@ -31,9 +31,9 @@ export class AutoLayoutConstraint implements IRawParams {
     toView: UIView | null = null
     toAttribute: AutoLayoutAttribute | null = null
     multiplier: number | null = null
-    constant: number | null = null
+    constant: number | UIEdgeInsets | null = null
 
-    constructor(view: UIView, attribute: AutoLayoutAttribute, relation: AutoLayoutRelation, toView: UIView | null, toAttribute: AutoLayoutAttribute | null, multiplier: number | null, constant: number | null) {
+    constructor(view: UIView, attribute: AutoLayoutAttribute, relation: AutoLayoutRelation, toView: UIView | null, toAttribute: AutoLayoutAttribute | null, multiplier: number | null, constant: number | UIEdgeInsets | null) {
         this.id = uuidv4()
         this.view = view
         this.attribute = attribute
