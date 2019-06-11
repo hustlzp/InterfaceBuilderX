@@ -7,6 +7,7 @@ import { UIStackView } from './UIStackView';
 import { UITextField } from './UITextField';
 import { UITableViewCell } from './UITableViewCell';
 import { UITextView } from './UITextView';
+import { UICollectionView } from './UICollectionView';
 
 export * from './UIView'
 export * from './UILabel'
@@ -18,6 +19,7 @@ export * from './UITextField'
 export * from './AutoLayout'
 export * from './UIStackView'
 export * from './UITextView'
+export * from './UICollectionView'
 
 export const ViewClasses: { new(): UIView }[] = [
     UIView,
@@ -28,5 +30,6 @@ export const ViewClasses: { new(): UIView }[] = [
     UITableViewCell,
     UIStackView,
     UITextField,
-    UITextView
+    UITextView,
+    UICollectionView
 ]

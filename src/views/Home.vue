@@ -485,7 +485,7 @@ export default class Home extends Vue {
 .codes-panel {
   position: fixed;
   top: 0;
-  right: 360px;
+  right: 375px;
   bottom: 0;
   left: 260px;
 }
