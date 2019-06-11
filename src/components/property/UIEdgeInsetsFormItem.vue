@@ -51,14 +51,14 @@ export default class UIEdgeInsetsFormItem extends Vue {
 
   dataChanged() {
     if (
-      (this.top as any) == "" ||
-      this.top == null ||
-      (this.left as any) == "" ||
-      this.left == null ||
-      (this.bottom as any) == "" ||
-      this.bottom == null ||
-      (this.right as any) == "" ||
-      this.right == null
+      (this.top as any) === "" ||
+      this.top === null ||
+      (this.left as any) === "" ||
+      this.left === null ||
+      (this.bottom as any) === "" ||
+      this.bottom === null ||
+      (this.right as any) === "" ||
+      this.right === null
     ) {
       this.$emit("input", null);
       return;

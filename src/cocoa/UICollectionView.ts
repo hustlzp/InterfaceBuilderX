@@ -35,7 +35,7 @@ export class UICollectionView extends UIView {
 
         codes += `\n${prefix}delegate = self
 ${prefix}dataSource = self
-${prefix}register(${this.cellClass || 'UICollectionViewCell'}.self, forCellReuseIdentifier: "${this.cellReuseIdentifier || 'cellReuseIdentifier'}")`
+${prefix}register(${this.cellClass || 'UICollectionViewCell'}.self, forCellWithReuseIdentifier: "${this.cellReuseIdentifier || 'cellReuseIdentifier'}")`
 
         codes += `\n\nlet layout = UICollectionViewFlowLayout()
 layout.itemSize = CGSize(width: ${this.itemSizeWidth}, height: ${this.itemSizeHeight})

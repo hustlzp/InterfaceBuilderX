@@ -60,7 +60,7 @@ export class UIButton extends UIView {
         }
 
         // Action
-        let action = this.action ? `#selector(${this.action})` : "nil"
+        let action = `#selector(${this.action || ''})`
         codes += `\n${prefix}addTarget(self, action: ${action}, for: .touchUpInside)`
 
         // font

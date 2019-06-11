@@ -16,7 +16,7 @@ export class UIImageView extends UIView {
         let prefix = this.isClassComponent ? "" : `${this.name}.`
 
         if (this.image) {
-            codes += `${prefix}image = ${this.image.codes}`
+            codes += `\n${prefix}image = ${this.image.codes}`
         }
 
         return codes

@@ -96,7 +96,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="Constant" v-if="!showEdgeInsetsControl">
-        <el-input v-model="form.constant" placeholder></el-input>
+        <el-input v-model.number="form.constant" placeholder></el-input>
       </el-form-item>
       <el-form-item label="Constant" v-if="showEdgeInsetsControl">
         <edge-insets-form-item v-model="form.edgeInsetsConstant"></edge-insets-form-item>
@@ -213,13 +213,12 @@ export default class AddConstraintDialog extends Vue {
       }
     }
 
-    if (!this.form.toView && !this.form.constant) {
+    if (
+      !this.form.toView &&
+      !this.form.constant &&
+      !this.form.edgeInsetsConstant
+    ) {
       this.$message.error("To View 与 Constant 不能都为空");
-      return;
-    }
-
-    if (this.showEdgeInsetsControl && !this.form.edgeInsetsConstant) {
-      this.$message.error("Constant 填写不完整");
       return;
     }
 

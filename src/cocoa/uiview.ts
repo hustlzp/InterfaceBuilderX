@@ -281,10 +281,8 @@ export class UIView implements IRawParams {
             codes += this.layoutCodes(null)
         }
 
-        if (!this.isClassComponent) {
-            codes += "\n\n"
-            codes += this.functionComponentCodes()
-        }
+        codes += "\n\n"
+        codes += this.functionComponentCodes()
 
         codes += "\n\n"
         codes += this.classComponentCodes()
@@ -552,6 +550,8 @@ export class UIView implements IRawParams {
         var codes = ""
 
         for (const subview of this.subviews) {
+            if (subview.isClassComponent) { continue }
+
             codes += "\n\n"
             codes += subview.functionComponentCodes()
         }
@@ -616,7 +616,7 @@ export class UIView implements IRawParams {
 
             if (constraint.constant) {
                 if (constraint.constant instanceof UIEdgeInsets) {
-                    codes += `.insets(${constraint.constant.codes})`
+                    codes += `.inset(${constraint.constant.codes})`
                 } else {
                     codes += `.offset(${constraint.constant})`
                 }
