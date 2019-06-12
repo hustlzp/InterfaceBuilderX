@@ -148,6 +148,7 @@ export class UIView implements IRawParams {
     subviews: UIView[] = []
     superview: UIView | null = null
     constraints: AutoLayoutConstraint[] = []
+    hasContentView: boolean = false
 
     // 是否为组件
     isComponent: boolean = false
@@ -322,13 +323,13 @@ export class UIView implements IRawParams {
         if (superview) {
             var prefix = ""
             if (superview.isClassComponent) {
-                if (superview.className == "UITableViewCell") {
-                    prefix = "contentView."
-                } else {
-                    prefix = ""
-                }
+                prefix = ""
             } else {
                 prefix = `${superview.name}.`
+            }
+
+            if (superview.hasContentView) {
+                prefix += "contentView."
             }
 
             if (superview.className == "UIStackView") {
@@ -598,13 +599,12 @@ export class UIView implements IRawParams {
         if (constraint.toView) {
             var toViewName = ""
             if (this.superview == constraint.toView && constraint.toView.isClassComponent) {
-                if (constraint.toView.className == "UITableViewCell") {
-                    toViewName = "contentView"
-                } else {
-                    toViewName = "self"
-                }
+                toViewName = "self"
             } else {
                 toViewName = constraint.toView.name
+            }
+            if (constraint.toView.hasContentView) {
+                toViewName += ".contentView"
             }
             codes += `(${toViewName}`
 

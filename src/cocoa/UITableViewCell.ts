@@ -19,6 +19,7 @@ enum UITableViewCellAccessoryType {
 export class UITableViewCell extends UIView {
     name: string = "tableViewCell"
     className: string = "UITableViewCell"
+    hasContentView: boolean = true
 
     @enumAttribute(UITableViewCellSelectionStyle, "Selection style")
     selectionStyle: UITableViewCellSelectionStyle = UITableViewCellSelectionStyle.default
