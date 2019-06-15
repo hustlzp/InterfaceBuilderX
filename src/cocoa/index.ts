@@ -10,6 +10,7 @@ import { UITextView } from './UITextView';
 import { UICollectionView } from './UICollectionView';
 import { UIScrollView } from './UIScrollView';
 import { UICollectionViewCell } from './UICollectionViewCell';
+import { UITableViewHeaderFooterView } from './UITableViewHeaderFooterView'
 
 export * from './UIView'
 export * from './UILabel'
@@ -24,6 +25,7 @@ export * from './UITextView'
 export * from './UICollectionView'
 export * from './UIScrollView'
 export * from './UICollectionViewCell'
+export * from './UITableViewHeaderFooterView'
 
 export const ViewClasses: { new(): UIView }[] = [
     UIView,
@@ -37,5 +39,6 @@ export const ViewClasses: { new(): UIView }[] = [
     UITextView,
     UICollectionView,
     UIScrollView,
-    UICollectionViewCell
+    UICollectionViewCell,
+    UITableViewHeaderFooterView
 ]
