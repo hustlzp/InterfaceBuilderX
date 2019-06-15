@@ -282,8 +282,10 @@ export class UIView implements IRawParams {
             codes += this.layoutCodes(null)
         }
 
-        codes += "\n\n"
-        codes += this.functionComponentCodes()
+        if (!this.isClassComponent) {
+            codes += "\n\n"
+            codes += this.functionComponentCodes()
+        }
 
         codes += "\n\n"
         codes += this.classComponentCodes()

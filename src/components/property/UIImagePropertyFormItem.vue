@@ -3,8 +3,6 @@
     <el-input
       class="input-image-name"
       :id="attribute.key"
-      :maxlength="6"
-      :minlength="6"
       v-model="name"
     ></el-input>
   </div>
