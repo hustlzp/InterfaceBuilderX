@@ -29,7 +29,8 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
-        <el-button type="default" @click="dialogVisible = false">取消</el-button>
+        <el-button type="default" v-if="!view" @click="onSubmitAndContinue">提交并继续</el-button>
+        <el-button type="text" class="btn-cancel" @click="dialogVisible = false">取消</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -72,6 +73,16 @@ export default class AddViewDialog extends Vue {
   }
 
   async onSubmit() {
+    this.submit();
+    this.dialogVisible = false;
+  }
+
+  onSubmitAndContinue() {
+    this.submit();
+    this.form.name = null;
+  }
+
+  submit() {
     if (!this.form.viewClass) {
       this.$message.error("类不能为空");
       return;
@@ -100,8 +111,6 @@ export default class AddViewDialog extends Vue {
 
       this.$emit("create", view);
     }
-
-    this.dialogVisible = false;
   }
 
   initData() {
@@ -133,4 +142,12 @@ export default class AddViewDialog extends Vue {
 </script>
 
 <style scoped lang="scss">
+.btn-cancel {
+  color: #909399;
+  margin-left: 15px !important;
+
+  &:hover {
+    color: #409eff;
+  }
+}
 </style>

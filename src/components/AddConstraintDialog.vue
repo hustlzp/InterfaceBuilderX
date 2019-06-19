@@ -107,7 +107,7 @@
       <el-form-item>
         <el-button type="primary" @click="onSubmit">提交</el-button>
         <el-button type="default" @click="onSubmitAndContinue">提交并继续</el-button>
-        <!-- <el-button type="default" @click="dialogVisible = false">取消</el-button> -->
+        <el-button type="text" class="btn-cancel" @click="dialogVisible = false">取消</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -350,5 +350,14 @@ export default class AddConstraintDialog extends Vue {
 .select-attribute,
 .select-to-attribute {
   width: 195px;
+}
+
+.btn-cancel {
+  color: #909399;
+  margin-left: 15px !important;
+
+  &:hover {
+    color: #409eff;
+  }
 }
 </style>

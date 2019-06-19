@@ -11,6 +11,7 @@ import { UICollectionView } from './UICollectionView';
 import { UIScrollView } from './UIScrollView';
 import { UICollectionViewCell } from './UICollectionViewCell';
 import { UITableViewHeaderFooterView } from './UITableViewHeaderFooterView'
+import { UIPickerView } from './UIPickerView';
 
 export * from './UIView'
 export * from './UILabel'
@@ -26,6 +27,7 @@ export * from './UICollectionView'
 export * from './UIScrollView'
 export * from './UICollectionViewCell'
 export * from './UITableViewHeaderFooterView'
+export * from './UIPickerView'
 
 export const ViewClasses: { new(): UIView }[] = [
     UIView,
@@ -40,5 +42,6 @@ export const ViewClasses: { new(): UIView }[] = [
     UICollectionView,
     UIScrollView,
     UICollectionViewCell,
-    UITableViewHeaderFooterView
+    UITableViewHeaderFooterView,
+    UIPickerView
 ]
