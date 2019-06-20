@@ -339,17 +339,15 @@ export default class AddConstraintDialog extends Vue {
 
 .input-view,
 .select-to-view {
-  width: 195px;
   margin-right: 12px;
 }
 
-.select-relation {
-  width: 195px;
-}
-
+.input-view,
+.select-to-view,
+.select-relation,
 .select-attribute,
 .select-to-attribute {
-  width: 195px;
+  width: 300px;
 }
 
 .btn-cancel {
