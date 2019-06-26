@@ -1,4 +1,5 @@
 import { UIColor, UIView, UIFont, attribute } from './UIView';
+import { capitalize } from '@/utils';
 
 export class UILabel extends UIView {
     name: string = "label"
@@ -16,6 +17,12 @@ export class UILabel extends UIView {
     @attribute(Number, "字间距")
     letterSpacing: number = 0
 
+    @attribute(Number, "行间距")
+    lineSpacing: number = 0
+
+    @attribute(Number, "段间距")
+    paragraphSpacing: number = 0
+
     // constructor() {
     //     super()
     // }
@@ -32,11 +39,29 @@ export class UILabel extends UIView {
         codes += `\n${prefix}font = ${this.font.codes}`
 
         let textCodes = `"${this.text || ''}".localized()`
-        if (this.letterSpacing > 0) {
-            // attributed text
+        if (this.letterSpacing > 0 || this.lineSpacing > 0 || this.paragraphSpacing > 0) {
+            var attributes: Attribute[] = []
+
+            if (this.lineSpacing > 0 || this.paragraphSpacing > 0) {
+                let paraStyleName = `paraStyleFor${capitalize(this.name)}`
+                codes += `\nlet ${paraStyleName} = NSMutableParagraphStyle()`
+
+                if (this.lineSpacing > 0) {
+                    codes += `\n${paraStyleName}.lineSpacing = ${this.lineSpacing}`
+                }
+                if (this.paragraphSpacing > 0) {
+                    codes += `\n${paraStyleName}.paragraphSpacing = ${this.paragraphSpacing}`
+                }
+
+                attributes.push({ key: ".paragraphStyle", value: paraStyleName })
+            }
+
+            if (this.letterSpacing > 0) {
+                attributes.push({ key: ".kern", value: this.letterSpacing })
+            }
 
             // letter spacing
-            codes += `\n${prefix}attributedText = NSAttributedString(string: ${textCodes}, attributes: [.kern: ${this.letterSpacing}])`
+            codes += `\n${prefix}attributedText = NSAttributedString(string: ${textCodes}, attributes: [${attributes.map(attribute => `${attribute.key}: ${attribute.value}`).join(', ')}])`
         } else {
             // plain text
             codes += `\n${prefix}text = ${textCodes}`
@@ -44,4 +69,9 @@ export class UILabel extends UIView {
 
         return codes
     }
+}
+
+interface Attribute {
+    key: string
+    value: any
 }
