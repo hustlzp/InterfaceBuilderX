@@ -1,4 +1,4 @@
-import { UIColor, UIView, UIFont, attribute, enumAttribute } from './UIView';
+import { UIColor, UIView, UIFont, attribute, enumAttribute, UIEdgeInsets } from './UIView';
 import { capitalize, indent } from '@/utils';
 
 enum LayoutAxis {
@@ -27,6 +27,9 @@ export class UIStackView extends UIView {
     @enumAttribute(UIStackViewDistribution, "Distribution")
     distribution: UIStackViewDistribution = UIStackViewDistribution.fill
 
+    @attribute(UIEdgeInsets, "layoutMargins")
+    layoutMargins: UIEdgeInsets | null = null
+
     selfViewCodes(): string {
         let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
@@ -37,6 +40,10 @@ export class UIStackView extends UIView {
         }
         if (typeof this.spacing == "number") {
             codes += `\n${prefix}spacing = ${this.spacing}`
+        }
+        if (this.layoutMargins) {
+            codes += `\n${prefix}isLayoutMarginsRelativeArrangement = true`
+            codes += `\n${prefix}layoutMargins = ${this.layoutMargins.codes}`
         }
 
         return codes
