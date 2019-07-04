@@ -32,6 +32,9 @@ export class UIButton extends UIView {
     @attribute(String, "Action")
     action: string | null = null
 
+    @attribute(Number, "字间距")
+    letterSpacing: number = 0
+
     // constructor(subviews: UIView[]) {
     //     super(subviews)
     // }
@@ -40,7 +43,7 @@ export class UIButton extends UIView {
         let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
 
-        if (this.image || this.hi) {
+        if (this.image || this.highlightedImage) {
             // 图片
             if (this.image) {
                 codes += `\n${prefix}setImage(${this.image.codes}, for: .normal)`
@@ -50,13 +53,15 @@ export class UIButton extends UIView {
             if (this.highlightedImage) {
                 codes += `\n${prefix}setImage(${this.highlightedImage.codes}, for: .highlighted)`
             }
-        } else {
-            // 文本
-            codes += `\n${prefix}setTitle("${this.title || ""}".localized(), for: .normal)`
-
-            // 文本颜色
+        } else {    // 文本
             let colorCodes = (this.titleColor || UIColor.black).codes
-            codes += `\n${prefix}setTitleColor(${colorCodes}, for: .normal)`
+            
+            if (this.letterSpacing == 0) {
+                codes += `\n${prefix}setTitle("${this.title || ""}".localized(), for: .normal)`
+                codes += `\n${prefix}setTitleColor(${colorCodes}, for: .normal)`
+            } else {
+                codes += `\n${prefix}setAttributedTitle(NSAttributedString(string: "${this.title || ""}", attributes: [.kern: ${this.letterSpacing}, .foregroundColor: ${colorCodes}]), for: .normal)`
+            }
         }
 
         // Action
