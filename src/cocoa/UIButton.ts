@@ -29,22 +29,18 @@ export class UIButton extends UIView {
     @attribute(UIFont, "字体")
     font: UIFont = UIFont.system(17)
 
-    @attribute(String, "Action")
-    action: string | null = null
-
     @attribute(Number, "字间距")
     letterSpacing: number = 0
 
-    // constructor(subviews: UIView[]) {
-    //     super(subviews)
-    // }
+    @attribute(String, "Action")
+    action: string | null = null
 
     selfViewCodes(): string {
         let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
 
+        // 图片
         if (this.image || this.highlightedImage) {
-            // 图片
             if (this.image) {
                 codes += `\n${prefix}setImage(${this.image.codes}, for: .normal)`
             }
