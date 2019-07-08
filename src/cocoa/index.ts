@@ -12,6 +12,7 @@ import { UIScrollView } from './UIScrollView';
 import { UICollectionViewCell } from './UICollectionViewCell';
 import { UITableViewHeaderFooterView } from './UITableViewHeaderFooterView'
 import { UIPickerView } from './UIPickerView';
+import { UICollectionReusableView } from './UICollectionReusableView';
 
 export * from './UIView'
 export * from './UILabel'
@@ -19,14 +20,15 @@ export * from './UIButton'
 export * from './UIImageView'
 export * from './UITableView'
 export * from './UITableViewCell'
+export * from './UITableViewHeaderFooterView'
 export * from './UITextField'
 export * from './AutoLayout'
 export * from './UIStackView'
 export * from './UITextView'
 export * from './UICollectionView'
-export * from './UIScrollView'
 export * from './UICollectionViewCell'
-export * from './UITableViewHeaderFooterView'
+export * from './UICollectionReusableView'
+export * from './UIScrollView'
 export * from './UIPickerView'
 
 export const ViewClasses: { new(): UIView }[] = [
@@ -39,9 +41,10 @@ export const ViewClasses: { new(): UIView }[] = [
     UIStackView,
     UITextField,
     UITextView,
-    UICollectionView,
     UIScrollView,
+    UICollectionView,
     UICollectionViewCell,
+    UICollectionReusableView,
     UITableViewHeaderFooterView,
     UIPickerView
 ]
