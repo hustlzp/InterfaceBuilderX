@@ -14,6 +14,17 @@ enum UIStackViewDistribution {
     equalCentering
 }
 
+enum UIStackViewAlignment {
+    fill,
+    leading,
+    top,
+    firstBaseline,
+    center,
+    trailing,
+    bottom,
+    lastBaseline
+}
+
 export class UIStackView extends UIView {
     name: string = "stackView"
     className: string = "UIStackView"
@@ -27,7 +38,10 @@ export class UIStackView extends UIView {
     @enumAttribute(UIStackViewDistribution, "Distribution")
     distribution: UIStackViewDistribution = UIStackViewDistribution.fill
 
-    @attribute(UIEdgeInsets, "layoutMargins")
+    @enumAttribute(UIStackViewAlignment, "Alignment")
+    alignment: UIStackViewAlignment = UIStackViewAlignment.fill
+
+    @attribute(UIEdgeInsets, "Layout Margins")
     layoutMargins: UIEdgeInsets | null = null
 
     selfViewCodes(): string {
@@ -38,7 +52,10 @@ export class UIStackView extends UIView {
         if (this.distribution != UIStackViewDistribution.fill) {
             codes += `\n${prefix}distribution = .${this.getEnumKeyForValue(UIStackViewDistribution, this.distribution)}`
         }
-        if (typeof this.spacing == "number") {
+        if (this.alignment != UIStackViewAlignment.fill) {
+            codes += `\n${prefix}alignment = .${this.getEnumKeyForValue(UIStackViewAlignment, this.alignment)}`
+        }
+        if (typeof this.spacing == "number" && this.spacing > 0) {
             codes += `\n${prefix}spacing = ${this.spacing}`
         }
         if (this.layoutMargins) {
