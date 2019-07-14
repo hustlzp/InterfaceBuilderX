@@ -1,4 +1,4 @@
-import { UIView, attribute, UIFont, UIColor, UIImage } from './UIView';
+import { UIView, attribute, UIFont, UIColor, UIImage, UIEdgeInsets } from './UIView';
 import { capitalize } from '@/utils';
 
 export class UIButton extends UIView {
@@ -32,12 +32,19 @@ export class UIButton extends UIView {
     @attribute(Number, "字间距")
     letterSpacing: number = 0
 
+    @attribute(UIEdgeInsets, "Content Insets")
+    contentEdgeInsets: UIEdgeInsets | null = null
+
     @attribute(String, "Action")
     action: string | null = null
 
     selfViewCodes(): string {
         let codes = super.selfViewCodes()
         let prefix = this.isClassComponent ? "" : `${this.name}.`
+
+        if (this.contentEdgeInsets) {
+            codes += `\n${prefix}contentEdgeInsets = ${this.contentEdgeInsets.codes}`
+        }
 
         // 图片
         if (this.image || this.highlightedImage) {
@@ -51,7 +58,7 @@ export class UIButton extends UIView {
             }
         } else {    // 文本
             let colorCodes = (this.titleColor || UIColor.black).codes
-            
+
             if (this.letterSpacing == 0) {
                 codes += `\n${prefix}setTitle("${this.title || ""}".localized(), for: .normal)`
                 codes += `\n${prefix}setTitleColor(${colorCodes}, for: .normal)`
