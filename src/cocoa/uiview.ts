@@ -385,7 +385,7 @@ export class UIView implements IRawParams {
     selfViewCodes(): string {
         let codes = ""
 
-        if (!this.isClassComponent) {
+        if (!this.isClassComponent) {   // Class component 是通过 super.init 初始化的，因此下面一行代码是不需要的
             if (!this.isClassProperty) {
                 codes += "let "
             }

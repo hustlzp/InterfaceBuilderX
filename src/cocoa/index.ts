@@ -13,6 +13,7 @@ import { UICollectionViewCell } from './UICollectionViewCell';
 import { UITableViewHeaderFooterView } from './UITableViewHeaderFooterView'
 import { UIPickerView } from './UIPickerView';
 import { UICollectionReusableView } from './UICollectionReusableView';
+import { UIVisualEffectView } from './UIVisualEffectView';
 
 export * from './UIView'
 export * from './UILabel'
@@ -30,6 +31,7 @@ export * from './UICollectionViewCell'
 export * from './UICollectionReusableView'
 export * from './UIScrollView'
 export * from './UIPickerView'
+export * from './UIVisualEffectView'
 
 export const ViewClasses: { new(): UIView }[] = [
     UIView,
@@ -46,5 +48,6 @@ export const ViewClasses: { new(): UIView }[] = [
     UICollectionViewCell,
     UICollectionReusableView,
     UITableViewHeaderFooterView,
-    UIPickerView
+    UIPickerView,
+    UIVisualEffectView
 ]
