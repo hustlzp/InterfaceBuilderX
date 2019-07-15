@@ -1,4 +1,6 @@
-# ios-interface-builder
+# Interface Builder X
+
+Built with Electron, Vue and TypeScript with love.
 
 ## Project setup
 ```
