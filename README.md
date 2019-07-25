@@ -2,6 +2,8 @@
 
 Built with Electron, Vue and TypeScript with love.
 
+![](https://raw.githubusercontent.com/hustlzp/InterfaceBuilderX/master/screenshot.png)
+
 ## Project setup
 ```
 npm install
